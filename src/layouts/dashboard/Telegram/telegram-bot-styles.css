@@ -1,0 +1,26 @@
+.list-item-text {
+    letter-spacing: 1px;
+}
+
+.illustration {
+    width: auto;
+    height: 350px;
+}
+
+.telegram-logo-illustration {
+    width: auto;
+    height: 350px;
+    opacity: 0.6;
+    z-index: 0;
+    position: absolute;
+    top: -45px;
+    left: 40px;
+}
+
+/* .flipped-icon {
+    transform: scaleX(-1);
+    -webkit-transform: scaleX(-1); /* Safari and Chrome */
+    -moz-transform: scaleX(-1); /* Firefox */
+    -ms-transform: scaleX(-1); /* IE */
+    -o-transform: scaleX(-1); /* Opera */
+} */

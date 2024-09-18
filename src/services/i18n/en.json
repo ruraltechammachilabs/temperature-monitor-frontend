@@ -1,0 +1,33 @@
+{
+  "villages": {
+    "Bramhaniapal": "Bramhaniapal",
+    "Kanaka": "Kanaka",
+    "Tantichira": "Tantichira",
+    "Kharamul": "Kharamul",
+    "Gobardhanpur": "Gobardhanpur",
+    "Asanbania": "Asanbania"
+  },
+  "crops": {
+    "Mango": "Mango",
+    "Cashew": "Cashew",
+    "Total": "Total"
+  },
+  "labels": {
+    "healthy": "Healthy",
+    "intermediate": "Intermediate",
+    "unhealthy": "Unhealthy"
+  },
+  "TotalCrops": "Total Crops",
+  "AIHealthMonitor": "AI Health Monitor",
+  "headings": {
+    "Labels": "Labels",
+    "Dashboard": "Wadi Villages",
+    "VillageProfile": "Village Profile"
+  },
+  "nav": {
+    "Dashboard": "Dashboard"
+  },
+  "markerdata": {
+    "FileName": "File Name"
+  }
+}

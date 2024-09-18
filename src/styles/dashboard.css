@@ -1,0 +1,83 @@
+.custom-card {
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 8px 24px,
+    rgba(17, 17, 26, 0.1) 0px 16px 56px, rgba(17, 17, 26, 0.1) 0px 24px 80px !important;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 0;
+}
+
+.power-button {
+  background: #8e0e00; /* fallback for old browsers */
+  /*background: -webkit-linear-gradient(to left, #8e0e00, #1f1c18); */ /* Chrome 10-25, Safari 5.1-6 */
+  background: -webkit-linear-gradient(
+    to right,
+    #ba1502,
+    #4f110c
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #ba1502, #4f110c);
+  border-radius: 10px;
+  color: white;
+}
+
+.reboot-button {
+  background: #283c86; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    to left,
+    #45a247,
+    #283c86
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to left,
+    #45a247,
+    #283c86
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  border-radius: 10px;
+  color: white;
+}
+
+/* .save-button {
+} */
+
+.cancel-button {
+  background: #e52d27;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #b31217, #e52d27);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #b31217, #e52d27); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+/* Pulsating Color */
+.pulsating {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    background-color: #f37171;
+  }
+  50% {
+    transform: scale(1.1);
+    background-color: #f37171;
+  }
+  100% {
+    transform: scale(1);
+    background-color: #f37171;
+  }
+}
+
+/* Alert Box */
+.alert-box {
+  border: 2px solid red; /* Set the border thickness and color */
+  border-left: 4px solid red; /* Make the left border thicker for the slant effect */
+  border-top-left-radius: 5px; /* Add rounded corners for a more polished look */
+  border-bottom-left-radius: 5px;
+  padding: 10px; /* Adjust padding as needed */
+}

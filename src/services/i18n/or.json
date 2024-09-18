@@ -1,0 +1,30 @@
+{
+  "villages": {
+    "Bramhaniapal": "ବ୍ରାହ୍ମଣିଆପାଲ୍ |",
+    "Kanaka": "କାନାକା |",
+    "Tantichira": "ଟାଣ୍ଟିଚିରା |",
+    "Kharamul": "ଖରାମୁଲ |",
+    "Gobardhanpur": "ଗୋବର୍ଦ୍ଧନପୁର |",
+    "Asanbania": "ଆସାନବାନିଆ |"
+  },
+  "crops": {
+    "Mango": "ଆମ୍ବ |",
+    "Cashew": "କାଜୁନାଟ୍ |",
+    "Total": "ସମୁଦାୟ"
+  },
+  "labels": {
+    "healthy": "ସ୍ୱାସ୍ଥ୍ୟକର",
+    "intermediate": "ମଧ୍ୟବର୍ତ୍ତୀ",
+    "unhealthy": "ଅସ୍ୱାସ୍ଥ୍ୟକର"
+  },
+  "TotalCrops": "ମୋଟ ଫସଲ |",
+  "AIHealthMonitor": "AI ସ୍ୱାସ୍ଥ୍ୟ ମନିଟର |",
+  "headings": {
+    "Labels": "ଲେବଲ୍",
+    "Dashboard": "ୱାଡି ଗ୍ରାମ",
+    "VillageProfile": "ଗ୍ରାମ ପ୍ରୋଫାଇଲ୍ |"
+  },
+  "nav": {
+    "Dashboard": "ଡ୍ୟାସବୋର୍ଡ |"
+  }
+}

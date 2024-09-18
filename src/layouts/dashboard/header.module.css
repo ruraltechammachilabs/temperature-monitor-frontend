@@ -1,0 +1,31 @@
+.headerlogo {
+    width: 70px;
+    height: 70px;
+}
+
+.navImgLogo {
+    max-width: 12rem;
+    max-height: 80px;
+    margin: 0 10px;
+}
+
+.imglogo {
+    max-width: 9vw;
+    max-height: 50px;
+    padding: 0 10px;
+}
+
+.amritaLogo {
+    max-width: 12vw;
+    max-height: 110px !important;
+}
+
+.ammachilabsLogo {
+    max-width: 9dvw !important;
+}
+
+.navImgWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
