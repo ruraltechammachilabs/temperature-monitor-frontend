@@ -1,0 +1,65 @@
+{
+	"villages": {
+		"Brahmaniapal": "ब्रम्हनियापाल",
+		"Kanaka": "कनाका",
+		"Tantichira": "तांतीचिरा",
+		"Kharmul": "खार्मुल",
+		"Gobardhanpur": "गोबरधनपुर",
+		"Asanbania": "आसनबनिया"
+	},
+	"crops": {
+		"Mango": "आम",
+		"Cashew": "काजू",
+		"Total": "टोटल"
+	},
+	"labels": {
+		"healthy": "स्वस्थ",
+		"intermediate": "इंटरमीडिएट",
+		"unhealthy": "बीमार"
+	},
+	"TotalCrops": "कुल फसलें",
+	"AIHealthMonitor": "ए आई स्वास्थ्य मॉनिटर",
+	"headings": {
+		"Labels": "लेबल",
+		"Dashboard": "वाडी गांवों",
+		"VillageProfile": "ग्राम प्रोफ़ाइल"
+	},
+	"nav": {
+		"Dashboard": "डैशबोर्ड"
+	},
+	"markerdata": {
+		"FileName": "फ़ाइल का नाम",
+		"ActualLabel": "वास्तविक लेबल",
+		"Prediction": "प्रेडिक्शन",
+		"Confidence": "कॉन्फिडेंस",
+		"UploadedBy": "द्वारा अपलोड किया गया",
+		"BeneficiaryName": "बेनेफिशरी का नाम",
+		"FarmerName": "किसान का नाम",
+		"CRPName": "सी.आर.पी. नाम"
+	},
+	"filters": {
+		"search": "खोज करें",
+		"types": {
+			"tableType": "टेबल प्रकार",
+			"sapling": "पौधा"
+		},
+		"tableType": {
+			"all": "सभी",
+			"monthly": "माहवार"
+		},
+		"sapling": {
+			"mixed": "संयुक्त"
+		}
+	},
+	"comparison": {
+		"beneficiaryName": "बेनेफिशरी का नाम",
+		"plotSize": "ज़मीन का आकार",
+		"mangoPlanted": "जमाया हुआ आम",
+		"cashewPlanted": "जमाया हुआ काजू",
+		"mangoLive": "आम सजीव",
+		"cashewLive": "काजू सजीव",
+		"mangoMortality": "आम मरा हुआ",
+		"cashewMortality": "काजू मरा हुआ",
+		"geoTag": "जियो-टैग"
+	}
+}
