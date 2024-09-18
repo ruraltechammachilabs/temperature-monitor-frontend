@@ -83,8 +83,8 @@ const UserView = ({ user }) => {
               }}
               src={
                 user.role === "Admin"
-                  ? "/assets/images/avatars/avatar_12.jpg"
-                  : "/assets/images/avatars/avatar_13.jpg"
+                  ? "/assets/icons/users/admin_icon.png"
+                  : "/assets/icons/users/user_icon.png"
               }
             />
           </Grid>

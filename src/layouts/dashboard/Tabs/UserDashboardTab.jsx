@@ -8,9 +8,13 @@ import {
   CardContent,
   Grid,
   Snackbar,
+  IconButton,
+  Stack,
 } from "@mui/material";
 
 /* MUI Icons */
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
 /* Components */
 import QuickBanner from "../../../sections/banner/QuickBanner";
@@ -173,12 +177,12 @@ const UserDashboardTab = () => {
       }
       
       /* Add data to realtime DB */
-      // const modifiedNewData = {
-      //   ...newData,
-      //   TimestampTime: convertToTimestamp(newData.Timestamp)
-      // }
-      // console.log(modifiedNewData)
-      // setRealtimeValues(modifiedNewData)
+      const modifiedNewData = {
+        ...newData,
+        TimestampTime: convertToTimestamp(newData.Timestamp)
+      }
+      console.log(modifiedNewData)
+      setRealtimeValues(modifiedNewData)
     });
 
     return () => unsubscribe();
@@ -281,6 +285,50 @@ const UserDashboardTab = () => {
         }}
       >
         <CurrentTime />
+        <Grid item xs={12}>
+          <Stack
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "end",
+              width: "100%",
+              mb: 2,
+            }}
+          >
+            <IconButton
+              aria-label="Audio Mute Button"
+              className="reboot-button"
+              sx={{
+                ml: 2,
+                p: 2,
+                display: "flex",
+                flexDirection: "column",
+              }}
+              onClick={handleAudioMute}
+            >
+              { 
+                isMuted ? (
+                  <VolumeOffIcon sx={{ width: 35, height: 35 }} />
+                ) : 
+                (
+                  <VolumeUpIcon sx={{ width: 35, height: 35 }} />
+                )
+              }
+              <span
+                style={{
+                  marginTop: "5px",
+                  fontSize: "small",
+                  letterSpacing: 1,
+                }}
+              >
+                {
+                  isMuted ? 'Muted' : 'Mute'
+                }
+              </span>
+            </IconButton>
+          </Stack>
+          </Grid>
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card sx={{ minWidth: 50 }} className={`custom-card ${ isTempPulsating ? 'pulsating': '' }`}>
             <CardContent
@@ -350,7 +398,6 @@ const UserDashboardTab = () => {
           </Card>
         </Grid>
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
-          {/* <QuickBanner percent={0.45} name="Smoke" /> */}
           <Card sx={{ minWidth: 50 }} className={`custom-card ${ isSmokePulsating ? 'pulsating': '' }`}>
             {/* <CardHeader
                 action={

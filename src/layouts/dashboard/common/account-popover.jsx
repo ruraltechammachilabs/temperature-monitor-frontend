@@ -44,7 +44,7 @@ export default function AccountPopover() {
 	const [account, setAccount] = useState({
 		displayName: "Jake Sully",
 		email: "admin@tempmonitor.app",
-		photoURL: "/assets/images/avatars/avatar_13.jpg",
+		photoURL: "/assets/icons/users/user_icon.png",
 	});
 
 	// useEffect(() => {
@@ -63,8 +63,10 @@ export default function AccountPopover() {
 		if (Object.keys(currentUser).length > 0) {
 			const userInfo = currentUser;
 			const email = userInfo.email;
+			const role = userInfo.role;
+			console.log(role)
 			setAccount((prev) => {
-				return { ...prev, email, displayName: userInfo.displayName };
+				return { ...prev, email, displayName: userInfo.displayName, photoURL: role === 'admin'? '/assets/icons/users/admin_icon.png' : '/assets/icons/users/user_icon.png'  };
 			});
 		}
 	}, [currentUser]);

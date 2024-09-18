@@ -32,9 +32,9 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import CloseIcon from "@mui/icons-material/Close";
 import PowerSettingsNewRoundedIcon from "@mui/icons-material/PowerSettingsNewRounded";
 import RestartAltRoundedIcon from "@mui/icons-material/RestartAltRounded";
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+// import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 // import TrendingFlatOutlinedIcon from "@mui/icons-material/TrendingFlatOutlined";
 // import MoreVertIcon from "@mui/icons-material/MoreVert";
 
@@ -62,7 +62,7 @@ import {
   listenForTempRangeChanges,
   listenForHumidRangeChanges,
   listenForSmokeRangeChanges,
-  deleteNodesWithoutTimestampTime
+  // deleteNodesWithoutTimestampTime
 } from "../../../firebase/operations";
 import { deleteAlertUser } from "../../../firebase/AlertUserOperations";
 import QuickBanner from "../../../sections/banner/QuickBanner";
@@ -73,16 +73,16 @@ import AddAlertUser from "../../../sections/alert-users/AddAlertUser";
 import { getLimitedAlertUsers } from "../../../firebase/AlertUserOperations";
 import CurrentTime from "../../../components/current-time/CurrentTime";
 import { GlobalDataContext } from "../../../Providers/GlobalDataProvider";
-// import { setThreshold } from "../../../services/monitoringSlice";
 import { convertToTimestamp, setRealtimeValues, getChartDataByDateTime } from "../../../firebase/operations";
-import { GraphDataContext } from "../../../Providers/GraphDataProvider";
+// import { setThreshold } from "../../../services/monitoringSlice";
+// import { GraphDataContext } from "../../../Providers/GraphDataProvider";
 
 const AdminDashboardTab = () => {
   const mdUp = useResponsive("up", "md");
   const mdDown = useResponsive("down", "md");
 
   const { isNewAlertUserAdded, setIsAlertUserRemoved, isAlertUserRemoved } = useContext(GlobalDataContext);
-  const { setTempGraphData, setHumidGraphData, setSmokeGraphData } = useContext(GraphDataContext)
+  // const { setTempGraphData, setHumidGraphData, setSmokeGraphData } = useContext(GraphDataContext)
 
   const [action, setAction] = useState("");
   const [isTempPulsating, setIsTempPulsating] = useState(false);
@@ -240,12 +240,12 @@ const AdminDashboardTab = () => {
       }
 
       /* Add data to realtime DB */
-      // const modifiedNewData = {
-      //   ...newData,
-      //   TimestampTime: convertToTimestamp(newData.Timestamp)
-      // }
-      // console.log(modifiedNewData)
-      // setRealtimeValues(modifiedNewData)
+      const modifiedNewData = {
+        ...newData,
+        TimestampTime: convertToTimestamp(newData.Timestamp)
+      }
+      console.log(modifiedNewData)
+      setRealtimeValues(modifiedNewData)
     });
 
     return () => unsubscribe();

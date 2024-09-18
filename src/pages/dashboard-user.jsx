@@ -75,10 +75,11 @@ const TemperatureDashboardUser = () => {
     if (location.pathname === "/dashboard/home") {
       setTabValue(0);
       setDashboardName("Dashboard");
-    } else if (location.pathname === "/dashboard/profile") {
-      setTabValue(1);
-      setDashboardName("Profile");
-    }
+    } 
+    // else if (location.pathname === "/dashboard/profile") {
+    //   setTabValue(1);
+    //   setDashboardName("Profile");
+    // }
   }, [location.pathname]);
 
   useEffect(() => {
@@ -93,7 +94,10 @@ const TemperatureDashboardUser = () => {
   }, [currentUser]);
 
   const handleTabChange = (event, newValue) => {
-    const paths = ["/dashboard/home", "/dashboard/profile"];
+    const paths = [
+      "/dashboard/home", 
+      // "/dashboard/profile"
+    ];
     navigate(paths[newValue]);
     setTabValue(newValue);
   };
@@ -173,7 +177,7 @@ const TemperatureDashboardUser = () => {
                 }}
               >
                 <Tab label="Dashboard" {...a11yProps(0)} />
-                <Tab label="Profile" {...a11yProps(1)} />
+                {/* <Tab label="Profile" {...a11yProps(1)} /> */}
               </Tabs>
             </Box>
           </Grid>
@@ -183,9 +187,9 @@ const TemperatureDashboardUser = () => {
       <CustomTabPanel value={tabValue} index={0}>
         <UserDashboardTab />
       </CustomTabPanel>
-      <CustomTabPanel value={tabValue} index={1}>
+      {/* <CustomTabPanel value={tabValue} index={1}>
         <ProfileTab />
-      </CustomTabPanel>
+      </CustomTabPanel> */}
     </>
   );
 };

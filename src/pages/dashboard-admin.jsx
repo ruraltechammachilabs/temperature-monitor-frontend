@@ -76,17 +76,19 @@ const TemperatureDashboardAdmin = () => {
 		if (location.pathname === "/dashboard/home") {
 			setTabValue(0);
 			setDashboardName("Dashboard");
-		} else if (location.pathname === "/dashboard/profile") {
+		} 
+		// else if (location.pathname === "/dashboard/profile") {
+		// 	setTabValue(1);
+		// 	setDashboardName("Profile");
+		// } 
+		else if (location.pathname === "/dashboard/alert-users") {
 			setTabValue(1);
-			setDashboardName("Profile");
-		} else if (location.pathname === "/dashboard/alert-users") {
-			setTabValue(2);
 			setDashboardName("Alert Users");
 		} else if (location.pathname === "/dashboard/users") {
-			setTabValue(3);
+			setTabValue(2);
 			setDashboardName("Users");
 		} else if (location.pathname === "/dashboard/settings") {
-			setTabValue(4);
+			setTabValue(3);
 			setDashboardName("Sensor Settings");
 		}
 	}, [location.pathname]);
@@ -107,7 +109,7 @@ const TemperatureDashboardAdmin = () => {
 	const handleTabChange = (event, newValue) => {
 		const paths = [
 			"/dashboard/home",
-			"/dashboard/profile",
+			// "/dashboard/profile",
 			"/dashboard/alert-users",
 			"/dashboard/users",
 			"/dashboard/settings",
@@ -191,12 +193,12 @@ const TemperatureDashboardAdmin = () => {
 								}}
 							>
 								<Tab label="Dashboard" {...a11yProps(0)} />
-								<Tab label="Profile" {...a11yProps(1)} />
-								<Tab label="Alert Users" {...a11yProps(2)} />
-								<Tab label="Users" {...a11yProps(3)} />
+								{/* <Tab label="Profile" {...a11yProps(1)} /> */}
+								<Tab label="Alert Users" {...a11yProps(1)} />
+								<Tab label="Users" {...a11yProps(2)} />
 								<Tab
 									label="Sensor Settings"
-									{...a11yProps(4)}
+									{...a11yProps(3)}
 								/>
 							</Tabs>
 						</Box>
@@ -207,16 +209,16 @@ const TemperatureDashboardAdmin = () => {
 			<CustomTabPanel value={tabValue} index={0}>
 				<AdminDashboardTab />
 			</CustomTabPanel>
-			<CustomTabPanel value={tabValue} index={1}>
+			{/* <CustomTabPanel value={tabValue} index={1}>
 				<ProfileTab />
-			</CustomTabPanel>
-			<CustomTabPanel value={tabValue} index={2}>
+			</CustomTabPanel> */}
+			<CustomTabPanel value={tabValue} index={1}>
 				<AlertUsersTab />
 			</CustomTabPanel>
-			<CustomTabPanel value={tabValue} index={3}>
+			<CustomTabPanel value={tabValue} index={2}>
 				<UsersTab />
 			</CustomTabPanel>
-			<CustomTabPanel value={tabValue} index={4}>
+			<CustomTabPanel value={tabValue} index={3}>
 				<SensorSettings />
 			</CustomTabPanel>
 		</>

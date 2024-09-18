@@ -229,10 +229,11 @@ const AddUser = ({ handleAddUserModalClose }) => {
 									width: "100%",
 								}}
 							>
+								{/* <AvatarRadio src="/assets/images/avatars/avatar_12.jpg" /> */}
 								<FormControlLabel
 									value="admin"
 									control={
-										<AvatarRadio src="/assets/images/avatars/avatar_12.jpg" />
+										<AvatarRadio src="/assets/icons/users/admin_icon.png" />
 									}
 									sx={{
 										margin: "0 auto",
@@ -266,10 +267,11 @@ const AddUser = ({ handleAddUserModalClose }) => {
 									width: "100%",
 								}}
 							>
+								{/* <AvatarRadio src="/assets/images/avatars/avatar_13.jpg" /> */}
 								<FormControlLabel
 									value="user"
 									control={
-										<AvatarRadio src="/assets/images/avatars/avatar_13.jpg" />
+										<AvatarRadio src="/assets/icons/users/user_icon.png" />
 									}
 									sx={{
 										margin: "0 auto",
