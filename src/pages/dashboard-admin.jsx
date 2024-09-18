@@ -18,12 +18,12 @@ import { grey } from "../theme/palette";
 import SensorSettings from "./sensor-settings";
 import { useResponsive } from "../hooks/use-responsive";
 import { GlobalDataContext } from "../Providers/GlobalDataProvider";
-import ProfileTab from "../layouts/dashboard/Tabs/ProfileTab";
 import AlertUsersTab from "../layouts/dashboard/Tabs/AlertUsersTab";
 import UsersTab from "../layouts/dashboard/Tabs/UsersTab";
 import { AuthContext } from "../Providers/AuthDataProvider";
 import { getUserByUid } from "../firebase/UserOperations";
 import AdminDashboardTab from "../layouts/dashboard/Tabs/AdminDashboardTab";
+// import ProfileTab from "../layouts/dashboard/Tabs/ProfileTab";
 
 /* Tabs */
 
@@ -102,9 +102,10 @@ const TemperatureDashboardAdmin = () => {
 				setIsAdmin(false);
 			}
 			setDbUser(userdata);
+			localStorage.setItem("dbuser", JSON.stringify(userdata))
 		};
 		fetchData();
-	}, [currentUser]);
+	}, []);
 
 	const handleTabChange = (event, newValue) => {
 		const paths = [
@@ -153,7 +154,7 @@ const TemperatureDashboardAdmin = () => {
 						sx={{
 							color: grey[200],
 							textAlign: mdUp ? "left" : "center",
-							ml: mdUp ? 30 : 0,
+							ml: mdUp ? 20 : 0,
 							m: mdDown ? "0 auto" : null,
 						}}
 					>

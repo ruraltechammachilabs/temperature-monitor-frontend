@@ -96,7 +96,6 @@ export const listAllUsers = async () => {
 
 		if (snapshot.exists()) {
 			const usersData = Object.values(snapshot.val());
-			console.log(usersData);
 			return usersData;
 		} else {
 			console.log("No users found.");
@@ -118,7 +117,6 @@ export const listFirstUsers = async () => {
 
 		if (snapshot.exists()) {
 			const usersData = Object.values(snapshot.val());
-			console.log(usersData);
 			return usersData;
 		} else {
 			console.log("No users found.");
@@ -206,29 +204,4 @@ export const updateCurrentUserProfile = async (
 		console.error("Error updating user profile:", error);
 		return false; // Indicate failure
 	}
-};
-
-// try {
-//   // await updateProfile(currentUser, {
-//   //   displayName: currentUser.displayName,
-//   // });
-//   console.log(currentUser, fullname)
-
-//   const dbRef = ref(fbDB, 'users');
-//   const userRef = child(dbRef, currentUser.uid);
-
-//   await update(userRef, {
-//     displayName: fullname
-//   }, {
-//     merge: true
-//   })
-
-//   console.log("User profile updated successfully");
-
-//   // return true; // Indicate success
-// } catch (error) {
-//   console.error("Error updating user profile:", error);
-//   // return false; // Indicate failure
-// }
-
-export const updateCurrentUserPassword = async () => {};
+}

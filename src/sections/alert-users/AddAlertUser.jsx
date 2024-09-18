@@ -72,13 +72,8 @@ const AddAlertUser = ({ closeModal }) => {
 		setChecked(newChecked);
 	};
 
-	// useEffect(() => {
-	// 	console.log(checked);
-	// }, [checked]);
-
 	/* Submit */
 	const handleAddUserClick = async () => {
-		console.log(checked, name, phone);
 		const user = {
 			name,
 			phone: "+91" + phone,

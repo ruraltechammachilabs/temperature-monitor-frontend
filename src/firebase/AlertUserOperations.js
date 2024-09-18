@@ -1,5 +1,5 @@
 import { db } from "./firebaseConfig";
-import { doc, updateDoc, deleteField } from "firebase/firestore";
+import { doc, updateDoc, deleteField, getDoc } from "firebase/firestore";
 import {
   ref,
   set,
@@ -43,7 +43,6 @@ export const getLimitedAlertUsers = async () => {
 
     if (snapshot.exists()) {
       const usersData = Object.values(snapshot.val());
-      console.log(usersData)
       return usersData;
     } else {
       console.log("No Alert users found.");
@@ -80,14 +79,67 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
   const powerDocRef = doc(db, "data_read", "power_sms");
   const callDocRef = doc(db, "data_read", "call");
 
+  /* Counts */
+  let regularCount = 0
+  let stageCount = 0
+  let powerCount = 0
+  let callCount = 0
+
+  /* Snapshot */
+
+  const regularDocSnap = await getDoc(regularDocRef)
+  const stageDocSnap = await getDoc(stageDocRef)
+  const powerDocSnap = await getDoc(powerDocRef)
+  const callDocSnap = await getDoc(callDocRef)
+
+  /* Set Counts */
+  if (regularDocSnap.exists()) {
+    const regular = regularDocSnap.data()
+    console.log("Regular data : ", regular);
+    regularCount = Object.keys(regular).length
+    console.log("Regular data Count : ", regularCount);
+  } else {
+    console.log("No such document named regular_sms !");
+  }
+
+  if (stageDocSnap.exists()) {
+    const stage = stageDocSnap.data()
+    console.log("Stage data : ", stage);
+    stageCount = Object.keys(stage).length
+    console.log("Stage data Count : ", stageCount);
+  } else {
+    console.log("No such document named stage_sms !");
+  }
+
+  if (powerDocSnap.exists()) {
+    const power = powerDocSnap.data()
+    console.log("Power data : ", power);
+    powerCount = Object.keys(power).length
+    console.log("Power data Count : ", powerCount);
+  } else {
+    console.log("No such document named power_sms !");
+  }
+  
+  if (callDocSnap.exists()) {
+    const calls = callDocSnap.data()
+    console.log("Call data : ", calls);
+    callCount = Object.keys(calls).length
+    console.log("Call data Count : ", callCount);
+  } else {
+    console.log("No such document named call !");
+  }
+
   /* Add Number */
   newAlertUser.updates.map((type) => {
     switch (type) {
-      case 0:
+      case 0: {
+
+        let regularName = 'person_' + (regularCount + 1);
         updateDoc(
           regularDocRef,
           {
-            [newAlertUser.name]: newAlertUser.phone,
+            // [newAlertUser.name]: newAlertUser.phone,
+            [regularName]: newAlertUser.phone,
           },
           {
             merge: true,
@@ -100,12 +152,15 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
             console.error("Error updating document: ", error);
           });
         break;
+      }
 
-      case 1:
+      case 1: {
+        let stageName = 'person_' + (stageCount + 1)
         updateDoc(
           stageDocRef,
           {
-            [newAlertUser.name]: newAlertUser.phone,
+            // [newAlertUser.name]: newAlertUser.phone,
+            [stageName]: newAlertUser.phone,
           },
           {
             merge: true,
@@ -118,12 +173,15 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
             console.error("Error updating document: ", error);
           });
         break;
+      }
 
-      case 2:
+      case 2: {
+        let powerName = 'person_' + (powerCount + 1)
         updateDoc(
           powerDocRef,
           {
-            [newAlertUser.name]: newAlertUser.phone,
+            // [newAlertUser.name]: newAlertUser.phone,
+            [powerName]: newAlertUser.phone,
           },
           {
             merge: true,
@@ -136,12 +194,15 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
             console.error("Error updating document: ", error);
           });
         break;
+      }
 
-      case 3:
+      case 3: {
+        let callName = 'person_' + (callCount + 1)
         updateDoc(
           callDocRef,
           {
-            [newAlertUser.name]: newAlertUser.phone,
+            // [newAlertUser.name]: newAlertUser.phone,
+            [callName]: newAlertUser.phone,
           },
           {
             merge: true,
@@ -154,11 +215,12 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
             console.error("Error updating document: ", error);
           });
         break;
+      }
       default:
         console.log("Not a valid number. Please provide a valid number.");
     }
   });
-};
+}
 
 export const deleteAlertUser = async (alertUser) => {
   /* Delete From Realtime DB */

@@ -38,7 +38,7 @@ const SlideTransition = (props) => {
 };
 
 export default function AccountPopover() {
-	const { currentUser } = useContext(AuthContext);
+	const { currentUser, dbUser } = useContext(AuthContext);
 	const [open, setOpen] = useState(null);
 	const navigate = useNavigate();
 	const [account, setAccount] = useState({
@@ -60,16 +60,15 @@ export default function AccountPopover() {
 	// }, []);
 
 	useEffect(() => {
-		if (Object.keys(currentUser).length > 0) {
-			const userInfo = currentUser;
+		if (Object.keys(dbUser).length > 0) {
+			const userInfo = dbUser;
 			const email = userInfo.email;
 			const role = userInfo.role;
-			console.log(role)
 			setAccount((prev) => {
 				return { ...prev, email, displayName: userInfo.displayName, photoURL: role === 'admin'? '/assets/icons/users/admin_icon.png' : '/assets/icons/users/user_icon.png'  };
 			});
 		}
-	}, [currentUser]);
+	}, [currentUser, dbUser]);
 
 	// Snackbar
 	const [state, setState] = useState({
@@ -107,6 +106,7 @@ export default function AccountPopover() {
 				handleSnackbarOpen(SlideTransition);
 				navigate("/auth/login");
 				localStorage.removeItem("userInfo");
+				localStorage.removeItem("dbuser");
 			})
 			.catch((error) => {
 				// An error happened

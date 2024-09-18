@@ -32,8 +32,8 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import CloseIcon from "@mui/icons-material/Close";
 import PowerSettingsNewRoundedIcon from "@mui/icons-material/PowerSettingsNewRounded";
 import RestartAltRoundedIcon from "@mui/icons-material/RestartAltRounded";
-import VolumeOffIcon from '@mui/icons-material/VolumeOff';
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 // import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 // import TrendingFlatOutlinedIcon from "@mui/icons-material/TrendingFlatOutlined";
 // import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -73,7 +73,11 @@ import AddAlertUser from "../../../sections/alert-users/AddAlertUser";
 import { getLimitedAlertUsers } from "../../../firebase/AlertUserOperations";
 import CurrentTime from "../../../components/current-time/CurrentTime";
 import { GlobalDataContext } from "../../../Providers/GlobalDataProvider";
-import { convertToTimestamp, setRealtimeValues, getChartDataByDateTime } from "../../../firebase/operations";
+import {
+  convertToTimestamp,
+  setRealtimeValues,
+  getChartDataByDateTime,
+} from "../../../firebase/operations";
 // import { setThreshold } from "../../../services/monitoringSlice";
 // import { GraphDataContext } from "../../../Providers/GraphDataProvider";
 
@@ -81,15 +85,16 @@ const AdminDashboardTab = () => {
   const mdUp = useResponsive("up", "md");
   const mdDown = useResponsive("down", "md");
 
-  const { isNewAlertUserAdded, setIsAlertUserRemoved, isAlertUserRemoved } = useContext(GlobalDataContext);
+  const { isNewAlertUserAdded, setIsAlertUserRemoved, isAlertUserRemoved } =
+    useContext(GlobalDataContext);
   // const { setTempGraphData, setHumidGraphData, setSmokeGraphData } = useContext(GraphDataContext)
 
   const [action, setAction] = useState("");
   const [isTempPulsating, setIsTempPulsating] = useState(false);
   const [isHumidityPulsating, setIsHumidityPulsating] = useState(false);
   const [isSmokePulsating, setIsSmokePulsating] = useState(false);
-  
-  const [mainGraphData, setMainGraphData] = useState([])
+
+  const [mainGraphData, setMainGraphData] = useState([]);
 
   const [alertUsers, setAlertUsers] = useState([]);
 
@@ -146,7 +151,7 @@ const AdminDashboardTab = () => {
   const audio1Ref = useRef(null);
   const audio2Ref = useRef(null);
   const audio3Ref = useRef(null);
-  const [isMuted, setIsMuted] = useState(false)
+  const [isMuted, setIsMuted] = useState(false);
 
   const handlePlay1 = () => {
     audio1Ref.current.play();
@@ -172,11 +177,34 @@ const AdminDashboardTab = () => {
     audio3Ref.current.pause();
   };
 
+  /* Load Ranges */
+
+  const loadRangeData = async () => {
+    try {
+      const [tempRange, humidRange, smokeRange] = await Promise.all([
+        getTempRanges(),
+        getHumidRanges(),
+        getSmokeRanges(),
+      ]);
+
+      /* Change the range for alert according to requirements */
+      const rangeState = {
+        Temperature: tempRange.high_temp_range,
+        Humidity: humidRange.normal_humid_range,
+        Smoke: smokeRange.smoke_limit,
+      };
+
+      localStorage.setItem("ranges", JSON.stringify(rangeState));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   /* Read Firestore Data */
   useEffect(() => {
     const fetchDataAndUpdateState = async () => {
       const data = await fetchData("Data_reads");
-      setData(data)
+      setData(data);
       loadRangeData();
     };
 
@@ -209,43 +237,80 @@ const AdminDashboardTab = () => {
       setData(newData);
       const ranges = JSON.parse(localStorage.getItem("ranges"));
 
-      /* Play Alert Sound if Temp > Limit  */
-      if (newData.Temperature > ranges.Temperature) {
-        console.log(newData.Temperature, ranges.Temperature);
-        handlePlay1();
-        setIsTempPulsating(true);
-      } else {
-        handlePause1();
-        setIsTempPulsating(false);
-      }
+      if (ranges === null || ranges === undefined) {
+        loadRangeData().then(() => {
+          /* Play Alert Sound if Temp > Limit  */
+          if (newData.Temperature > ranges.Temperature) {
+            handlePlay1();
+            setIsTempPulsating(true);
+          } else {
+            handlePause1();
+            setIsTempPulsating(false);
+          }
+  
+          /* Humidity */
+          if (newData.Humidity > ranges.Humidity) {
+            handlePlay2();
+            setIsHumidityPulsating(true);
+          } else {
+            handlePause2();
+            setIsHumidityPulsating(false);
+          }
+  
+          /* Smoke */
+          if (newData.Smoke > ranges.Smoke) {
+            handlePlay3();
+            setIsSmokePulsating(true);
+          } else {
+            handlePause3();
+            setIsSmokePulsating(false);
+          }
+  
+          /* Add data to realtime DB */
+          const modifiedNewData = {
+            ...newData,
+            TimestampTime: convertToTimestamp(newData.Timestamp),
+          };
 
-      /* Humidity */
-      if (newData.Humidity > ranges.Humidity) {
-        console.log(newData.Humidity, ranges.Humidity);
-        handlePlay2();
-        setIsHumidityPulsating(true);
-      } else {
-        handlePause2();
-        setIsHumidityPulsating(false);
-      }
+          // setRealtimeValues(modifiedNewData);
+        })
 
-      /* Smoke */
-      if (newData.Smoke > ranges.Smoke) {
-        console.log(newData.Smoke, ranges.Smoke);
-        handlePlay3();
-        setIsSmokePulsating(true);
       } else {
-        handlePause3();
-        setIsSmokePulsating(false);
-      }
+        /* Play Alert Sound if Temp > Limit  */
+        if (newData.Temperature > ranges.Temperature) {
+          handlePlay1();
+          setIsTempPulsating(true);
+        } else {
+          handlePause1();
+          setIsTempPulsating(false);
+        }
 
-      /* Add data to realtime DB */
-      const modifiedNewData = {
-        ...newData,
-        TimestampTime: convertToTimestamp(newData.Timestamp)
+        /* Humidity */
+        if (newData.Humidity > ranges.Humidity) {
+          handlePlay2();
+          setIsHumidityPulsating(true);
+        } else {
+          handlePause2();
+          setIsHumidityPulsating(false);
+        }
+
+        /* Smoke */
+        if (newData.Smoke > ranges.Smoke) {
+          handlePlay3();
+          setIsSmokePulsating(true);
+        } else {
+          handlePause3();
+          setIsSmokePulsating(false);
+        }
+
+        /* Add data to realtime DB */
+        const modifiedNewData = {
+          ...newData,
+          TimestampTime: convertToTimestamp(newData.Timestamp),
+        };
+
+        // setRealtimeValues(modifiedNewData);
       }
-      console.log(modifiedNewData)
-      setRealtimeValues(modifiedNewData)
     });
 
     return () => unsubscribe();
@@ -254,27 +319,38 @@ const AdminDashboardTab = () => {
   /* Fetch Live Graph Data */
   useEffect(() => {
     const fetchLiveData = async () => {
-      const mainData = await getChartDataByDateTime()
-      // console.log("main live graph data => ", mainData)
+      const mainData = await getChartDataByDateTime();
 
-      setMainGraphData(mainData)
-    }
+      setMainGraphData(mainData);
+    };
 
-    fetchLiveData()
-
-  }, [])
+    fetchLiveData();
+  }, []);
 
   /* Temperature Changes Alert */
   useEffect(() => {
     const unsubscribe = listenForTempRangeChanges((newData) => {
       const ranges = JSON.parse(localStorage.getItem("ranges"));
 
-      const newRanges = {
-        Temperature: newData.high_temp_range,
-        Humidity: ranges.Humidity,
-        Smoke: ranges.Smoke,
-      };
-      localStorage.setItem("ranges", JSON.stringify(newRanges));
+      if(ranges !== null && ranges !== undefined) {
+        const newRanges = {
+          Temperature: newData.high_temp_range,
+          Humidity: ranges.Humidity,
+          Smoke: ranges.Smoke,
+        };
+        localStorage.setItem("ranges", JSON.stringify(newRanges));
+      } else {
+        loadRangeData().then(() => {
+          const ranges = JSON.parse(localStorage.getItem("ranges"));
+          const newRanges = {
+            Temperature: newData.high_temp_range,
+            Humidity: ranges.Humidity,
+            Smoke: ranges.Smoke,
+          };
+          localStorage.setItem("ranges", JSON.stringify(newRanges));
+        })
+      }
+
     });
     return () => unsubscribe();
   }, []);
@@ -284,12 +360,24 @@ const AdminDashboardTab = () => {
     const unsubscribe = listenForHumidRangeChanges((newData) => {
       const ranges = JSON.parse(localStorage.getItem("ranges"));
 
-      const newRanges = {
-        Temperature: ranges.Temperature,
-        Humidity: newData.normal_humid_range,
-        Smoke: ranges.Smoke,
-      };
-      localStorage.setItem("ranges", JSON.stringify(newRanges));
+      if(ranges !== null && ranges !== undefined) {
+        const newRanges = {
+          Temperature: ranges.Temperature,
+          Humidity: newData.normal_humid_range,
+          Smoke: ranges.Smoke,
+        };
+        localStorage.setItem("ranges", JSON.stringify(newRanges));
+      } else {
+        loadRangeData().then(() => {
+          const ranges = JSON.parse(localStorage.getItem("ranges"));
+          const newRanges = {
+            Temperature: ranges.Temperature,
+            Humidity: newData.normal_humid_range,
+            Smoke: ranges.Smoke,
+          };
+          localStorage.setItem("ranges", JSON.stringify(newRanges));
+        })
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -299,12 +387,22 @@ const AdminDashboardTab = () => {
     const unsubscribe = listenForSmokeRangeChanges((newData) => {
       const ranges = JSON.parse(localStorage.getItem("ranges"));
 
-      const newRanges = {
-        Temperature: ranges.Temperature,
-        Humidity: ranges.Humidity,
-        Smoke: newData.smoke_limit,
-      };
-      localStorage.setItem("ranges", JSON.stringify(newRanges));
+      if(ranges !== null && ranges !== undefined) {
+        const newRanges = {
+          Temperature: ranges.Temperature,
+          Humidity: ranges.Humidity,
+          Smoke: newData.smoke_limit,
+        };
+        localStorage.setItem("ranges", JSON.stringify(newRanges));
+      } else {
+        const ranges = JSON.parse(localStorage.getItem("ranges"));
+        const newRanges = {
+          Temperature: ranges.Temperature,
+          Humidity: ranges.Humidity,
+          Smoke: newData.smoke_limit,
+        };
+        localStorage.setItem("ranges", JSON.stringify(newRanges));
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -313,7 +411,6 @@ const AdminDashboardTab = () => {
   useEffect(() => {
     const fetchData = async () => {
       await getLimitedAlertUsers().then((alertusers) => {
-        console.log("alertUsers -> ", alertusers);
         setAlertUsers(alertusers);
       });
     };
@@ -323,20 +420,16 @@ const AdminDashboardTab = () => {
 
   /* Alert User Actions */
   useEffect(() => {
-
     const fetchData = async () => {
       await getLimitedAlertUsers().then((alertusers) => {
-        console.log("alertUsers -> ", alertusers);
         setAlertUsers(alertusers);
       });
     };
 
-    
-    if(isNewAlertUserAdded || isAlertUserRemoved) {
-      console.log(isNewAlertUserAdded, isAlertUserRemoved)
+    if (isNewAlertUserAdded || isAlertUserRemoved) {
       fetchData();
     }
-  }, [isNewAlertUserAdded, isAlertUserRemoved])
+  }, [isNewAlertUserAdded, isAlertUserRemoved]);
 
   /* System Actions */
 
@@ -355,43 +448,38 @@ const AdminDashboardTab = () => {
   };
 
   const handleDeleteAlertUser = async (alertUser) => {
-		console.log(alertUser)
-		await deleteAlertUser(alertUser)
-		.then(() => {
-			setIsAlertUserRemoved(true)
-		}) 
+    console.log(alertUser);
+    await deleteAlertUser(alertUser).then(() => {
+      setIsAlertUserRemoved(true);
+    });
 
-		setIsAlertUserRemoved(false)
-	}
+    setIsAlertUserRemoved(false);
+  };
 
   /* Audio Actions */
 
   const handleAudioMute = () => {
-    setIsMuted(!isMuted)
-    checkIfMuted(!isMuted)
-  }
+    setIsMuted(!isMuted);
+    checkIfMuted(!isMuted);
+  };
 
   const checkIfMuted = (isMute) => {
-    if(isMute) {
-      audio1Ref.current.muted = true
-      audio2Ref.current.muted = true
-      audio3Ref.current.muted = true
+    if (isMute) {
+      audio1Ref.current.muted = true;
+      audio2Ref.current.muted = true;
+      audio3Ref.current.muted = true;
     } else {
-      audio1Ref.current.muted = false
-      audio2Ref.current.muted = false
-      audio3Ref.current.muted = false
+      audio1Ref.current.muted = false;
+      audio2Ref.current.muted = false;
+      audio3Ref.current.muted = false;
     }
-  }
-
-  // const handleGetLiveTemperatureData = () => {
-
-  // }
+  };
 
   return (
     <>
-      <audio ref={audio1Ref} src="/assets/sounds/alarm-2.mp3" />
-      <audio ref={audio2Ref} src="/assets/sounds/alarm-2.mp3" />
-      <audio ref={audio3Ref} src="/assets/sounds/alarm-1.wav" />
+      <audio ref={audio1Ref} src="/assets/sounds/alarm-2.mp3" loop />
+      <audio ref={audio2Ref} src="/assets/sounds/alarm-2.mp3" loop />
+      <audio ref={audio3Ref} src="/assets/sounds/alarm-1.wav" loop />
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <Alert
@@ -439,8 +527,8 @@ const AdminDashboardTab = () => {
         container
         spacing={2}
         sx={{
-          pr: mdUp ? 25 : 0,
-          pl: mdUp ? 25 : 0,
+          pr: mdUp ? 15 : 0,
+          pl: mdUp ? 15 : 0,
           pt: 2,
           display: "flex",
           position: "relative",
@@ -524,7 +612,7 @@ const AdminDashboardTab = () => {
                 Delete
               </span>
             </IconButton> */}
-            
+
             <IconButton
               aria-label="Audio Mute Button"
               className="reboot-button"
@@ -536,14 +624,11 @@ const AdminDashboardTab = () => {
               }}
               onClick={handleAudioMute}
             >
-              { 
-                isMuted ? (
-                  <VolumeOffIcon sx={{ width: 35, height: 35 }} />
-                ) : 
-                (
-                  <VolumeUpIcon sx={{ width: 35, height: 35 }} />
-                )
-              }
+              {isMuted ? (
+                <VolumeOffIcon sx={{ width: 35, height: 35 }} />
+              ) : (
+                <VolumeUpIcon sx={{ width: 35, height: 35 }} />
+              )}
               <span
                 style={{
                   marginTop: "5px",
@@ -551,9 +636,7 @@ const AdminDashboardTab = () => {
                   letterSpacing: 1,
                 }}
               >
-                {
-                  isMuted ? 'Muted' : 'Mute'
-                }
+                {isMuted ? "Muted" : "Mute"}
               </span>
             </IconButton>
           </Stack>
@@ -613,9 +696,9 @@ const AdminDashboardTab = () => {
                         ],
                       }}
                     /> */}
-                  <TemperatureGraph 
-                    title="Live Temperature Monitor" 
-                    chartInfo={mainGraphData.temperature} 
+                  <TemperatureGraph
+                    title="Live Temperature Monitor"
+                    chartInfo={mainGraphData.temperature}
                   />
                 </Grid>
               </Grid>
@@ -708,36 +791,36 @@ const AdminDashboardTab = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <SmokeGraph
-                  chartInfo={mainGraphData.smoke}
-                  // title="Live Smoke Detection Monitor"
-                  // chart={{
-                  //   labels: [
-                  //     "01/01/2024",
-                  //     "02/01/2024",
-                  //     "03/01/2024",
-                  //     "04/01/2024",
-                  //     "05/01/2024",
-                  //     "06/01/2024",
-                  //     "07/01/2024",
-                  //     "08/01/2024",
-                  //     "09/01/2024",
-                  //     "10/01/2024",
-                  //     "11/01/2024",
-                  //     "12/01/2024",
-                  //     "12/02/2024",
-                  //   ],
-                  //   series: [
-                  //     {
-                  //       name: "Smoke",
-                  //       type: "area",
-                  //       fill: "gradient",
-                  //       data: [
-                  //         44.5, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43, 50,
-                  //         33,
-                  //       ],
-                  //     },
-                  //   ],
-                  // }}
+                    chartInfo={mainGraphData.smoke}
+                    // title="Live Smoke Detection Monitor"
+                    // chart={{
+                    //   labels: [
+                    //     "01/01/2024",
+                    //     "02/01/2024",
+                    //     "03/01/2024",
+                    //     "04/01/2024",
+                    //     "05/01/2024",
+                    //     "06/01/2024",
+                    //     "07/01/2024",
+                    //     "08/01/2024",
+                    //     "09/01/2024",
+                    //     "10/01/2024",
+                    //     "11/01/2024",
+                    //     "12/01/2024",
+                    //     "12/02/2024",
+                    //   ],
+                    //   series: [
+                    //     {
+                    //       name: "Smoke",
+                    //       type: "area",
+                    //       fill: "gradient",
+                    //       data: [
+                    //         44.5, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43, 50,
+                    //         33,
+                    //       ],
+                    //     },
+                    //   ],
+                    // }}
                   />
                 </Grid>
               </Grid>
@@ -817,8 +900,8 @@ const AdminDashboardTab = () => {
                       key={index}
                       alignItems="center"
                       secondaryAction={
-                        <IconButton 
-                          edge="end" 
+                        <IconButton
+                          edge="end"
                           aria-label="delete"
                           onClick={() => handleDeleteAlertUser(user)}
                         >
@@ -841,7 +924,7 @@ const AdminDashboardTab = () => {
                               component="span"
                               color="#aaa7c3"
                             >
-                              { user.name }
+                              {user.name}
                             </Typography>
                           </>
                         }
@@ -853,7 +936,7 @@ const AdminDashboardTab = () => {
                               variant="body2"
                               color="#A7A4D2"
                             >
-                              { user.phone }
+                              {user.phone}
                             </Typography>
                           </>
                         }
@@ -1003,7 +1086,7 @@ const AdminDashboardTab = () => {
               p: 0,
             }}
           >
-            <AddAlertUser />
+            <AddAlertUser closeModal={handleModalClose} />
           </CardContent>
         </Card>
       </Modal>

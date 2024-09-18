@@ -206,7 +206,7 @@ const SmokeRangeSettings = () => {
                         valueLabelDisplay="auto"
                         color="primary"
                         min={0}
-                        max={8000}
+                        max={10000}
                         step={20}
                         marks={[
                           {
@@ -214,8 +214,8 @@ const SmokeRangeSettings = () => {
                             label: "0",
                           },
                           {
-                            value: 8000,
-                            label: "8k",
+                            value: 10000,
+                            label: "10k",
                           },
                         ]}
                         onChange={(event) => setSmokeLimit(event.target.value)}

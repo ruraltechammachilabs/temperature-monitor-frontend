@@ -10,11 +10,13 @@ import {
   Snackbar,
   IconButton,
   Stack,
+  Alert,
+  AlertTitle
 } from "@mui/material";
 
 /* MUI Icons */
-import VolumeOffIcon from '@mui/icons-material/VolumeOff';
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 /* Components */
 import QuickBanner from "../../../sections/banner/QuickBanner";
@@ -28,7 +30,7 @@ import {
   listenForDocumentChanges,
   listenForTempRangeChanges,
   listenForHumidRangeChanges,
-  listenForSmokeRangeChanges
+  listenForSmokeRangeChanges,
 } from "../../../firebase/operations";
 import {
   getHumidRanges,
@@ -45,8 +47,11 @@ import "../../../styles/dashboard.css";
 
 /* Components */
 import CurrentTime from "../../../components/current-time/CurrentTime";
-import { convertToTimestamp, setRealtimeValues, getChartDataByDateTime } from "../../../firebase/operations";
-
+import {
+  convertToTimestamp,
+  setRealtimeValues,
+  getChartDataByDateTime,
+} from "../../../firebase/operations";
 
 const UserDashboardTab = () => {
   const mdUp = useResponsive("up", "md");
@@ -57,7 +62,7 @@ const UserDashboardTab = () => {
   const [isHumidityPulsating, setIsHumidityPulsating] = useState(false);
   const [isSmokePulsating, setIsSmokePulsating] = useState(false);
 
-  const [mainGraphData, setMainGraphData] = useState([])
+  const [mainGraphData, setMainGraphData] = useState([]);
 
   /* snackbar alert */
   const [state, setState] = useState({
@@ -83,7 +88,7 @@ const UserDashboardTab = () => {
   const audio1Ref = useRef(null);
   const audio2Ref = useRef(null);
   const audio3Ref = useRef(null);
-  const [isMuted, setIsMuted] = useState(false)
+  const [isMuted, setIsMuted] = useState(false);
 
   const handlePlay1 = () => {
     audio1Ref.current.play();
@@ -92,7 +97,7 @@ const UserDashboardTab = () => {
   const handlePause1 = () => {
     audio1Ref.current.pause();
   };
-  
+
   const handlePlay2 = () => {
     audio2Ref.current.play();
   };
@@ -100,13 +105,35 @@ const UserDashboardTab = () => {
   const handlePause2 = () => {
     audio2Ref.current.pause();
   };
-  
+
   const handlePlay3 = () => {
     audio3Ref.current.play();
   };
 
   const handlePause3 = () => {
     audio3Ref.current.pause();
+  };
+
+  /* Load Ranges */
+
+  const loadRangeData = async () => {
+    try {
+      const [tempRange, humidRange, smokeRange] = await Promise.all([
+        getTempRanges(),
+        getHumidRanges(),
+        getSmokeRanges(),
+      ]);
+
+      const rangeState = {
+        Temperature: tempRange.high_temp_range,
+        Humidity: humidRange.normal_humid_range,
+        Smoke: smokeRange.smoke_limit,
+      };
+
+      localStorage.setItem("ranges", JSON.stringify(rangeState));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   /* Read Firestore Data */
@@ -124,19 +151,17 @@ const UserDashboardTab = () => {
         const [tempRange, humidRange, smokeRange] = await Promise.all([
           getTempRanges(),
           getHumidRanges(),
-          getSmokeRanges()
+          getSmokeRanges(),
         ]);
 
         rangeState = {
-          Temperature: tempRange.high_temp_range_test,
-          Humidity: humidRange.normal_humid_range_test,
+          Temperature: tempRange.high_temp_range,
+          Humidity: humidRange.normal_humid_range,
           Smoke: smokeRange.smoke_limit,
         };
-  
         localStorage.setItem("ranges", JSON.stringify(rangeState));
-
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -146,43 +171,80 @@ const UserDashboardTab = () => {
       setData(newData);
       const ranges = JSON.parse(localStorage.getItem("ranges"));
 
-      /* Play Alert Sound if Temp > Limit  */
-      if (newData.Temperature > ranges.Temperature) {
-        console.log(newData.Temperature, ranges.Temperature);
-        handlePlay1()
-        setIsTempPulsating(true)
-      } else {
-        handlePause1()
-        setIsTempPulsating(false)
-      }
+      if (ranges === null || ranges === undefined) {
+        loadRangeData().then(() => {
+          /* Play Alert Sound if Temp > Limit  */
+          if (newData.Temperature > ranges.Temperature) {
+            handlePlay1();
+            setIsTempPulsating(true);
+          } else {
+            handlePause1();
+            setIsTempPulsating(false);
+          }
+  
+          /* Humidity */
+          if (newData.Humidity > ranges.Humidity) {
+            handlePlay2();
+            setIsHumidityPulsating(true);
+          } else {
+            handlePause2();
+            setIsHumidityPulsating(false);
+          }
+  
+          /* Smoke */
+          if (newData.Smoke > ranges.Smoke) {
+            handlePlay3();
+            setIsSmokePulsating(true);
+          } else {
+            handlePause3();
+            setIsSmokePulsating(false);
+          }
+  
+          /* Add data to realtime DB */
+          const modifiedNewData = {
+            ...newData,
+            TimestampTime: convertToTimestamp(newData.Timestamp),
+          };
+          setRealtimeValues(modifiedNewData);
 
-      /* Humidity */
-      if (newData.Humidity > ranges.Humidity) {
-        console.log(newData.Humidity, ranges.Humidity);
-        handlePlay2()
-        setIsHumidityPulsating(true)
+        })
+
       } else {
-        handlePause2()
-        setIsHumidityPulsating(false)
+        /* Play Alert Sound if Temp > Limit  */
+        if (newData.Temperature > ranges.Temperature) {
+          handlePlay1();
+          setIsTempPulsating(true);
+        } else {
+          handlePause1();
+          setIsTempPulsating(false);
+        }
+
+        /* Humidity */
+        if (newData.Humidity > ranges.Humidity) {
+          handlePlay2();
+          setIsHumidityPulsating(true);
+        } else {
+          handlePause2();
+          setIsHumidityPulsating(false);
+        }
+
+        /* Smoke */
+        if (newData.Smoke > ranges.Smoke) {
+          handlePlay3();
+          setIsSmokePulsating(true);
+        } else {
+          handlePause3();
+          setIsSmokePulsating(false);
+        }
+
+        /* Add data to realtime DB */
+        const modifiedNewData = {
+          ...newData,
+          TimestampTime: convertToTimestamp(newData.Timestamp),
+        };
+        // console.log(modifiedNewData);
+        setRealtimeValues(modifiedNewData);
       }
-      
-      /* Smoke */
-      if (newData.Smoke > ranges.Smoke) {
-        console.log(newData.Smoke, ranges.Smoke);
-        handlePlay3()
-        setIsSmokePulsating(true)
-      } else {
-        handlePause3()
-        setIsSmokePulsating(false)
-      }
-      
-      /* Add data to realtime DB */
-      const modifiedNewData = {
-        ...newData,
-        TimestampTime: convertToTimestamp(newData.Timestamp)
-      }
-      console.log(modifiedNewData)
-      setRealtimeValues(modifiedNewData)
     });
 
     return () => unsubscribe();
@@ -191,27 +253,38 @@ const UserDashboardTab = () => {
   /* Fetch Live Graph Data */
   useEffect(() => {
     const fetchLiveData = async () => {
-      const mainData = await getChartDataByDateTime()
-      console.log("main live graph data => ", mainData)
+      const mainData = await getChartDataByDateTime();
 
-      setMainGraphData(mainData)
-    }
+      setMainGraphData(mainData);
+    };
 
-    fetchLiveData()
-
-  }, [])
+    fetchLiveData();
+  }, []);
 
   /* Temperature Changes Alert */
   useEffect(() => {
     const unsubscribe = listenForTempRangeChanges((newData) => {
       const ranges = JSON.parse(localStorage.getItem("ranges"));
 
-      const newRanges = {
-        Temperature: newData.high_temp_range_test,
-        Humidity: ranges.Humidity,
-        Smoke: ranges.Smoke
+      if(ranges !== null && ranges !== undefined) {
+        const newRanges = {
+          Temperature: newData.high_temp_range,
+          Humidity: ranges.Humidity,
+          Smoke: ranges.Smoke,
+        };
+        localStorage.setItem("ranges", JSON.stringify(newRanges));
+      } else {
+        loadRangeData().then(() => {
+          const ranges = JSON.parse(localStorage.getItem("ranges"));
+          const newRanges = {
+            Temperature: newData.high_temp_range,
+            Humidity: ranges.Humidity,
+            Smoke: ranges.Smoke,
+          };
+          localStorage.setItem("ranges", JSON.stringify(newRanges));
+        })
       }
-      localStorage.setItem("ranges", JSON.stringify(newRanges))
+
     });
     return () => unsubscribe();
   }, []);
@@ -221,12 +294,24 @@ const UserDashboardTab = () => {
     const unsubscribe = listenForHumidRangeChanges((newData) => {
       const ranges = JSON.parse(localStorage.getItem("ranges"));
 
-      const newRanges = {
-        Temperature: ranges.Temperature,
-        Humidity: newData.normal_humid_range,
-        Smoke: ranges.Smoke
+      if(ranges !== null && ranges !== undefined) {
+        const newRanges = {
+          Temperature: ranges.Temperature,
+          Humidity: newData.normal_humid_range,
+          Smoke: ranges.Smoke,
+        };
+        localStorage.setItem("ranges", JSON.stringify(newRanges));
+      } else {
+        loadRangeData().then(() => {
+          const ranges = JSON.parse(localStorage.getItem("ranges"));
+          const newRanges = {
+            Temperature: ranges.Temperature,
+            Humidity: newData.normal_humid_range,
+            Smoke: ranges.Smoke,
+          };
+          localStorage.setItem("ranges", JSON.stringify(newRanges));
+        })
       }
-      localStorage.setItem("ranges", JSON.stringify(newRanges))
     });
     return () => unsubscribe();
   }, []);
@@ -236,48 +321,97 @@ const UserDashboardTab = () => {
     const unsubscribe = listenForSmokeRangeChanges((newData) => {
       const ranges = JSON.parse(localStorage.getItem("ranges"));
 
-      const newRanges = {
-        Temperature: ranges.Temperature,
-        Humidity: ranges.Humidity,
-        Smoke: newData.smoke_limit
+      if(ranges !== null && ranges !== undefined) {
+        const newRanges = {
+          Temperature: ranges.Temperature,
+          Humidity: ranges.Humidity,
+          Smoke: newData.smoke_limit,
+        };
+        localStorage.setItem("ranges", JSON.stringify(newRanges));
+      } else {
+        const ranges = JSON.parse(localStorage.getItem("ranges"));
+        const newRanges = {
+          Temperature: ranges.Temperature,
+          Humidity: ranges.Humidity,
+          Smoke: newData.smoke_limit,
+        };
+        localStorage.setItem("ranges", JSON.stringify(newRanges));
       }
-      localStorage.setItem("ranges", JSON.stringify(newRanges))
     });
     return () => unsubscribe();
   }, []);
 
+
   /* Audio Actions */
 
   const handleAudioMute = () => {
-    setIsMuted(!isMuted)
-    checkIfMuted(!isMuted)
-  }
+    setIsMuted(!isMuted);
+    checkIfMuted(!isMuted);
+  };
 
   const checkIfMuted = (isMute) => {
-    if(isMute) {
-      audio1Ref.current.muted = true
-      audio2Ref.current.muted = true
-      audio3Ref.current.muted = true
+    if (isMute) {
+      audio1Ref.current.muted = true;
+      audio2Ref.current.muted = true;
+      audio3Ref.current.muted = true;
     } else {
-      audio1Ref.current.muted = false
-      audio2Ref.current.muted = false
-      audio3Ref.current.muted = false
+      audio1Ref.current.muted = false;
+      audio2Ref.current.muted = false;
+      audio3Ref.current.muted = false;
     }
-  }
-
-  
+  };
 
   return (
     <>
-      <audio ref={audio1Ref} src="/assets/sounds/alarm-2.mp3" />
-      <audio ref={audio2Ref} src="/assets/sounds/alarm-2.mp3" />
-      <audio ref={audio3Ref} src="/assets/sounds/alarm-1.mp3" />
+      <audio ref={audio1Ref} src="/assets/sounds/alarm-2.mp3" loop />
+      <audio ref={audio2Ref} src="/assets/sounds/alarm-2.mp3" loop />
+      <audio ref={audio3Ref} src="/assets/sounds/alarm-1.wav" loop />
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          <Alert
+            severity="error"
+            sx={{
+              justifyContent: "center",
+              textAlign: "center",
+              display: isTempPulsating ? "flex" : "none",
+            }}
+            className="alert-box"
+          >
+            <AlertTitle style={{ textAlign: "center" }}>WARNING</AlertTitle>
+            CRITICAL ALERT - TEMPERATURE HIGH
+          </Alert>
+          <Alert
+            severity="error"
+            sx={{
+              display: isHumidityPulsating ? "flex" : "none",
+              justifyContent: "center",
+              textAlign: "center",
+            }}
+            className="alert-box"
+          >
+            <AlertTitle style={{ textAlign: "center" }}>WARNING</AlertTitle>
+            CRITICAL ALERT - HUMIDITY HIGH
+          </Alert>
+          <Alert
+            severity="error"
+            sx={{
+              display: isSmokePulsating ? "flex" : "none",
+              justifyContent: "center",
+              textAlign: "center",
+            }}
+            className="alert-box"
+          >
+            <AlertTitle style={{ textAlign: "center" }}>WARNING</AlertTitle>
+            CRITICAL ALERT - SMOKE HIGH
+          </Alert>
+        </Grid>
+      </Grid>
       <Grid
         container
         spacing={2}
         sx={{
-          pr: mdUp ? 25 : 0,
-          pl: mdUp ? 25 : 0,
+          pr: mdUp ? 15 : 0,
+          pl: mdUp ? 15 : 0,
           pt: 2,
           display: "flex",
           position: "relative",
@@ -307,14 +441,11 @@ const UserDashboardTab = () => {
               }}
               onClick={handleAudioMute}
             >
-              { 
-                isMuted ? (
-                  <VolumeOffIcon sx={{ width: 35, height: 35 }} />
-                ) : 
-                (
-                  <VolumeUpIcon sx={{ width: 35, height: 35 }} />
-                )
-              }
+              {isMuted ? (
+                <VolumeOffIcon sx={{ width: 35, height: 35 }} />
+              ) : (
+                <VolumeUpIcon sx={{ width: 35, height: 35 }} />
+              )}
               <span
                 style={{
                   marginTop: "5px",
@@ -322,15 +453,16 @@ const UserDashboardTab = () => {
                   letterSpacing: 1,
                 }}
               >
-                {
-                  isMuted ? 'Muted' : 'Mute'
-                }
+                {isMuted ? "Muted" : "Mute"}
               </span>
             </IconButton>
           </Stack>
-          </Grid>
+        </Grid>
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
-          <Card sx={{ minWidth: 50 }} className={`custom-card ${ isTempPulsating ? 'pulsating': '' }`}>
+          <Card
+            sx={{ minWidth: 50 }}
+            className={`custom-card ${isTempPulsating ? "pulsating" : ""}`}
+          >
             <CardContent
               sx={{
                 display: "flex",
@@ -354,9 +486,9 @@ const UserDashboardTab = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <TemperatureGraph 
+                  <TemperatureGraph
                     title="Live Temperature Monitor"
-                    chartInfo={mainGraphData.temperature} 
+                    chartInfo={mainGraphData.temperature}
                   />
                 </Grid>
               </Grid>
@@ -364,7 +496,10 @@ const UserDashboardTab = () => {
           </Card>
         </Grid>
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
-          <Card sx={{ minWidth: 50 }} className={`custom-card ${ isHumidityPulsating ? 'pulsating': '' }`}>
+          <Card
+            sx={{ minWidth: 50 }}
+            className={`custom-card ${isHumidityPulsating ? "pulsating" : ""}`}
+          >
             <CardContent
               sx={{
                 display: "flex",
@@ -398,7 +533,10 @@ const UserDashboardTab = () => {
           </Card>
         </Grid>
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
-          <Card sx={{ minWidth: 50 }} className={`custom-card ${ isSmokePulsating ? 'pulsating': '' }`}>
+          <Card
+            sx={{ minWidth: 50 }}
+            className={`custom-card ${isSmokePulsating ? "pulsating" : ""}`}
+          >
             {/* <CardHeader
                 action={
                   <IconButton aria-label="settings">
@@ -424,42 +562,50 @@ const UserDashboardTab = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid 
-          item 
-          xs={12} 
+        <Grid
+          item
+          xs={12}
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
+            display: "flex",
+            justifyContent: "center",
           }}
         >
-              <img src="/assets/illustrations/server-rack-1.png" alt="server rack"
-                style={{
-                  maxWidth: mdDown ? '10rem' : '20rem',
-                  maxHeight: mdDown ? '15rem' : '',
-                  marginRight: '-15px'
-                }}
-              />
-              <img src="/assets/illustrations/server-rack-1.png" alt="server rack"
-                style={{
-                  maxWidth: mdDown ? '10rem' : '20rem',
-                  maxHeight: mdDown ? '15rem' : '',
-                  marginRight: '-15px'
-                }}
-              />
-              <img src="/assets/illustrations/server-rack-1.png" alt="server rack"
-                style={{
-                  maxWidth: mdDown ? '10rem' : '20rem',
-                  maxHeight: mdDown ? '15rem' : '',
-                  marginRight: '-15px'
-                }}
-              />
-              <img src="/assets/illustrations/server-rack-1.png" alt="server rack"
-                style={{
-                  maxWidth: mdDown ? '10rem' : '20rem',
-                  maxHeight: mdDown ? '15rem' : '',
-                  marginRight: '-15px'
-                }}
-              />
+          <img
+            src="/assets/illustrations/server-rack-1.png"
+            alt="server rack"
+            style={{
+              maxWidth: mdDown ? "10rem" : "20rem",
+              maxHeight: mdDown ? "15rem" : "",
+              marginRight: "-15px",
+            }}
+          />
+          <img
+            src="/assets/illustrations/server-rack-1.png"
+            alt="server rack"
+            style={{
+              maxWidth: mdDown ? "10rem" : "20rem",
+              maxHeight: mdDown ? "15rem" : "",
+              marginRight: "-15px",
+            }}
+          />
+          <img
+            src="/assets/illustrations/server-rack-1.png"
+            alt="server rack"
+            style={{
+              maxWidth: mdDown ? "10rem" : "20rem",
+              maxHeight: mdDown ? "15rem" : "",
+              marginRight: "-15px",
+            }}
+          />
+          <img
+            src="/assets/illustrations/server-rack-1.png"
+            alt="server rack"
+            style={{
+              maxWidth: mdDown ? "10rem" : "20rem",
+              maxHeight: mdDown ? "15rem" : "",
+              marginRight: "-15px",
+            }}
+          />
         </Grid>
 
         <Snackbar

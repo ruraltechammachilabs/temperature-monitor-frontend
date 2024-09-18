@@ -17,10 +17,10 @@ import "../styles/dashboard.css";
 import { grey } from "../theme/palette";
 import { useResponsive } from "../hooks/use-responsive";
 import { GlobalDataContext } from "../Providers/GlobalDataProvider";
-import ProfileTab from "../layouts/dashboard/Tabs/ProfileTab";
 import { AuthContext } from "../Providers/AuthDataProvider";
 import { getUserByUid } from "../firebase/UserOperations";
 import UserDashboardTab from "../layouts/dashboard/Tabs/UserDashboardTab";
+// import ProfileTab from "../layouts/dashboard/Tabs/ProfileTab"; 
 // import UsersTab from "../layouts/dashboard/Tabs/UsersTab";
 // import DashboardTab from "../layouts/dashboard/Tabs/DashboardTab";
 
@@ -83,7 +83,6 @@ const TemperatureDashboardUser = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    console.log("current user, dashboard -> ", currentUser);
     const fetchData = async () => {
       const userdata = await getUserByUid(currentUser.email);
       console.log(userdata);
@@ -137,7 +136,7 @@ const TemperatureDashboardUser = () => {
             sx={{
               color: grey[200],
               textAlign: mdUp ? "left" : "center",
-              ml: mdUp ? 30 : 0,
+              ml: mdUp ? 20 : 0,
               m: mdDown ? "0 auto" : null,
             }}
           >

@@ -97,7 +97,6 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 	};
 
 	const handleDeleteAlertUser = async (alertUser) => {
-		console.log(alertUser)
 		await deleteAlertUser(alertUser)
 		.then(() => {
 			setIsAlertUserRemoved(true)
