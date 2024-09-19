@@ -265,7 +265,7 @@ const UserDashboardTab = () => {
           TimestampTime: convertToTimestamp(newData.Timestamp),
         };
         // console.log(modifiedNewData);
-        // setRealtimeValues(modifiedNewData);
+        setRealtimeValues(modifiedNewData);
       }
     });
 

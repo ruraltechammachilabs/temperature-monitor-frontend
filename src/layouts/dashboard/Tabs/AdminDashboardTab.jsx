@@ -293,7 +293,7 @@ const AdminDashboardTab = () => {
             TimestampTime: convertToTimestamp(newData.Timestamp),
           };
 
-          // setRealtimeValues(modifiedNewData);
+          setRealtimeValues(modifiedNewData);
         });
       } else {
         /* Play Alert Sound if Temp > Limit  */
@@ -332,7 +332,7 @@ const AdminDashboardTab = () => {
           TimestampTime: convertToTimestamp(newData.Timestamp),
         };
 
-        // setRealtimeValues(modifiedNewData);
+        setRealtimeValues(modifiedNewData);
       }
     });
 
