@@ -24,6 +24,7 @@ import {
   Alert,
   AlertTitle,
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 /* MUI Icons */
 import AddIcon from "@mui/icons-material/Add";
@@ -34,6 +35,7 @@ import PowerSettingsNewRoundedIcon from "@mui/icons-material/PowerSettingsNewRou
 import RestartAltRoundedIcon from "@mui/icons-material/RestartAltRounded";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import BarChartIcon from '@mui/icons-material/BarChart';
 // import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 // import TrendingFlatOutlinedIcon from "@mui/icons-material/TrendingFlatOutlined";
 // import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -90,13 +92,22 @@ const AdminDashboardTab = () => {
   // const { setTempGraphData, setHumidGraphData, setSmokeGraphData } = useContext(GraphDataContext)
 
   const [action, setAction] = useState("");
+  const [tempRanges, setTempRanges] = useState({});
+  const [humidRanges, setHumidRanges] = useState({});
+  const [smokeRanges, setSmokeRanges] = useState({});
+
+  /* Alert Variables */
   const [isTempPulsating, setIsTempPulsating] = useState(false);
   const [isHumidityPulsating, setIsHumidityPulsating] = useState(false);
   const [isSmokePulsating, setIsSmokePulsating] = useState(false);
 
-  const [mainGraphData, setMainGraphData] = useState([]);
-
   const [alertUsers, setAlertUsers] = useState([]);
+
+  /* Graphs */
+  const [mainGraphData, setMainGraphData] = useState([]);
+  const [showTempGraph, setShowTempGraph] = useState(false);
+  const [showHumidGraph, setShowHumidGraph] = useState(false);
+  const [showSmokeGraph, setShowSmokeGraph] = useState(false);
 
   /* monitor Redux state */
   // const storedTemperature = useSelector((state) => state.monitor.temperature)
@@ -194,6 +205,11 @@ const AdminDashboardTab = () => {
         Smoke: smokeRange.smoke_limit,
       };
 
+      /* Store all Ranges to show in Dashboard UI */
+      setTempRanges(tempRange);
+      setHumidRanges(humidRange);
+      setSmokeRanges(smokeRange);
+
       localStorage.setItem("ranges", JSON.stringify(rangeState));
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -225,6 +241,11 @@ const AdminDashboardTab = () => {
           Smoke: smokeRange.smoke_limit,
         };
 
+        /* Store all Ranges to show in Dashboard UI */
+        setTempRanges(tempRange);
+        setHumidRanges(humidRange);
+        setSmokeRanges(smokeRange);
+
         localStorage.setItem("ranges", JSON.stringify(rangeState));
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -247,7 +268,7 @@ const AdminDashboardTab = () => {
             handlePause1();
             setIsTempPulsating(false);
           }
-  
+
           /* Humidity */
           if (newData.Humidity > ranges.Humidity) {
             handlePlay2();
@@ -256,7 +277,7 @@ const AdminDashboardTab = () => {
             handlePause2();
             setIsHumidityPulsating(false);
           }
-  
+
           /* Smoke */
           if (newData.Smoke > ranges.Smoke) {
             handlePlay3();
@@ -265,7 +286,7 @@ const AdminDashboardTab = () => {
             handlePause3();
             setIsSmokePulsating(false);
           }
-  
+
           /* Add data to realtime DB */
           const modifiedNewData = {
             ...newData,
@@ -273,11 +294,11 @@ const AdminDashboardTab = () => {
           };
 
           // setRealtimeValues(modifiedNewData);
-        })
-
+        });
       } else {
         /* Play Alert Sound if Temp > Limit  */
-        if (newData.Temperature > ranges.Temperature) {
+        // if (newData.Temperature > ranges.Temperature) {
+        if (newData.Temperature > tempRanges.high_temp_range) {
           handlePlay1();
           setIsTempPulsating(true);
         } else {
@@ -286,7 +307,8 @@ const AdminDashboardTab = () => {
         }
 
         /* Humidity */
-        if (newData.Humidity > ranges.Humidity) {
+        // if (newData.Humidity > ranges.Humidity) {
+        if (newData.Humidity > humidRanges.normal_humid_range) {
           handlePlay2();
           setIsHumidityPulsating(true);
         } else {
@@ -295,7 +317,8 @@ const AdminDashboardTab = () => {
         }
 
         /* Smoke */
-        if (newData.Smoke > ranges.Smoke) {
+        // if (newData.Smoke > ranges.Smoke) {
+        if (newData.Smoke > smokeRanges.smoke_limit) {
           handlePlay3();
           setIsSmokePulsating(true);
         } else {
@@ -316,6 +339,43 @@ const AdminDashboardTab = () => {
     return () => unsubscribe();
   }, []);
 
+  /* Trigger Alert if Limits Changes */
+  useEffect(() => {
+    /* Play Alert Sound if Temp > Limit  */
+    // if (newData.Temperature > ranges.Temperature) {
+    if (data.Temperature > tempRanges.high_temp_range) {
+      handlePlay1();
+      setIsTempPulsating(true);
+    } else {
+      handlePause1();
+      setIsTempPulsating(false);
+    }
+  }, [tempRanges]);
+
+  useEffect(() => {
+    /* Humidity */
+    // if (newData.Humidity > ranges.Humidity) {
+    if (data.Humidity > humidRanges.normal_humid_range) {
+      handlePlay2();
+      setIsHumidityPulsating(true);
+    } else {
+      handlePause2();
+      setIsHumidityPulsating(false);
+    }
+  }, [humidRanges]);
+
+  useEffect(() => {
+    /* Smoke */
+    // if (newData.Smoke > ranges.Smoke) {
+    if (data.Smoke > smokeRanges.smoke_limit) {
+      handlePlay3();
+      setIsSmokePulsating(true);
+    } else {
+      handlePause3();
+      setIsSmokePulsating(false);
+    }
+  }, [smokeRanges]);
+
   /* Fetch Live Graph Data */
   useEffect(() => {
     const fetchLiveData = async () => {
@@ -332,12 +392,13 @@ const AdminDashboardTab = () => {
     const unsubscribe = listenForTempRangeChanges((newData) => {
       const ranges = JSON.parse(localStorage.getItem("ranges"));
 
-      if(ranges !== null && ranges !== undefined) {
+      if (ranges !== null && ranges !== undefined) {
         const newRanges = {
           Temperature: newData.high_temp_range,
           Humidity: ranges.Humidity,
           Smoke: ranges.Smoke,
         };
+        setTempRanges(newData);
         localStorage.setItem("ranges", JSON.stringify(newRanges));
       } else {
         loadRangeData().then(() => {
@@ -347,10 +408,10 @@ const AdminDashboardTab = () => {
             Humidity: ranges.Humidity,
             Smoke: ranges.Smoke,
           };
+          setTempRanges(newData);
           localStorage.setItem("ranges", JSON.stringify(newRanges));
-        })
+        });
       }
-
     });
     return () => unsubscribe();
   }, []);
@@ -360,12 +421,13 @@ const AdminDashboardTab = () => {
     const unsubscribe = listenForHumidRangeChanges((newData) => {
       const ranges = JSON.parse(localStorage.getItem("ranges"));
 
-      if(ranges !== null && ranges !== undefined) {
+      if (ranges !== null && ranges !== undefined) {
         const newRanges = {
           Temperature: ranges.Temperature,
           Humidity: newData.normal_humid_range,
           Smoke: ranges.Smoke,
         };
+        setHumidRanges(newData);
         localStorage.setItem("ranges", JSON.stringify(newRanges));
       } else {
         loadRangeData().then(() => {
@@ -375,8 +437,9 @@ const AdminDashboardTab = () => {
             Humidity: newData.normal_humid_range,
             Smoke: ranges.Smoke,
           };
+          setHumidRanges(newData);
           localStorage.setItem("ranges", JSON.stringify(newRanges));
-        })
+        });
       }
     });
     return () => unsubscribe();
@@ -387,12 +450,13 @@ const AdminDashboardTab = () => {
     const unsubscribe = listenForSmokeRangeChanges((newData) => {
       const ranges = JSON.parse(localStorage.getItem("ranges"));
 
-      if(ranges !== null && ranges !== undefined) {
+      if (ranges !== null && ranges !== undefined) {
         const newRanges = {
           Temperature: ranges.Temperature,
           Humidity: ranges.Humidity,
           Smoke: newData.smoke_limit,
         };
+        setSmokeRanges(newData);
         localStorage.setItem("ranges", JSON.stringify(newRanges));
       } else {
         const ranges = JSON.parse(localStorage.getItem("ranges"));
@@ -401,6 +465,7 @@ const AdminDashboardTab = () => {
           Humidity: ranges.Humidity,
           Smoke: newData.smoke_limit,
         };
+        setSmokeRanges(newData);
         localStorage.setItem("ranges", JSON.stringify(newRanges));
       }
     });
@@ -474,6 +539,19 @@ const AdminDashboardTab = () => {
       audio3Ref.current.muted = false;
     }
   };
+
+  /* Toggle Button Click Events for Viewing Graph */
+  const handleTempGraphButtonClick = () => {
+    setShowTempGraph(!showTempGraph)
+  }
+  
+  const handleHumidityGraphButtonClick = () => {
+    setShowHumidGraph(!showHumidGraph)
+  }
+  
+  const handleSmokeGraphButtonClick = () => {
+    setShowSmokeGraph(!showSmokeGraph)
+  }
 
   return (
     <>
@@ -642,6 +720,227 @@ const AdminDashboardTab = () => {
           </Stack>
         </Grid>
         <CurrentTime />
+
+        {/* Limits */}
+        <Grid item xs={12} alignItems="center" justifyContent="center">
+          <Card sx={{ minWidth: 50 }} className="custom-card">
+            <CardContent
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Grid container spacing={1}>
+                {/* Temperature Limits */}
+                <Grid
+                  item
+                  xs={12}
+                  md={4}
+                  sx={{ p: 2, borderRight: "1px dashed #ccc" }}
+                >
+                  <Grid container spacing={1}>
+                    <Grid
+                      item
+                      xs={12}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Typography variant="h5">Temperature Limit</Typography>
+                    </Grid>
+                    {/* Temp Low */}
+                    <Grid item xs={6}>
+                      <Typography variant="h5" align="left">
+                        Low
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h5" align="right">
+                        {`${tempRanges["low_temp_range"]} °C`}
+                      </Typography>
+                    </Grid>
+
+                    {/* Temp Normal */}
+                    <Grid item xs={6}>
+                      <Typography variant="h5" align="left">
+                        Normal
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h5" align="right">
+                        {`${tempRanges["normal_temp_range"]} °C`}
+                      </Typography>
+                    </Grid>
+
+                    {/* Temp High */}
+                    <Grid item xs={6}>
+                      <Typography variant="h5" align="left">
+                        High
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h5" align="right">
+                        {`${tempRanges["high_temp_range"]} °C`}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Grid>
+
+                {/* Humidity Limits */}
+                <Grid
+                  item
+                  xs={12}
+                  md={4}
+                  sx={{ p: 2, borderRight: "1px dashed #ccc" }}
+                >
+                  <Grid container spacing={1}>
+                    <Grid
+                      item
+                      xs={12}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Typography variant="h5">Humidity Limit</Typography>
+                    </Grid>
+
+                    {/* Humid Low */}
+                    <Grid item xs={6}>
+                      <Typography variant="h5" align="left">
+                        Low
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h5" align="right">
+                        {`${humidRanges["low_humid_range"]} %`}
+                      </Typography>
+                    </Grid>
+
+                    {/* Humid Normal */}
+                    <Grid item xs={6}>
+                      <Typography variant="h5" align="left">
+                        Normal
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h5" align="right">
+                        {`${humidRanges["normal_humid_range"]} %`}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Grid>
+
+                {/* Smoke Limits */}
+                <Grid item xs={12} md={4} sx={{ p: 2 }}>
+                  <Grid container spacing={1}>
+                    <Grid
+                      item
+                      xs={12}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Typography variant="h5">Smoke Limit</Typography>
+                    </Grid>
+
+                    {/* Smoke */}
+                    <Grid item xs={6}>
+                      <Typography variant="h5" align="left">
+                        Limit
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h5" align="right">
+                        {`${smokeRanges["smoke_limit"]}`}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Humidity Limits */}
+        {/* <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
+          <Card
+            sx={{ minWidth: 50 }}
+            className={`custom-card ${isTempPulsating ? "pulsating" : ""}`}
+          >
+            <CardContent
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Grid container spacing={1}> */}
+
+        {/* Humid Low */}
+        {/* <Grid item xs={6}>
+                  <Typography variant="h5" align="left">
+                    Low
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="h5" align="right">
+                    {`${humidRanges["low_humid_range"]} %` }
+                  </Typography>
+                </Grid> */}
+
+        {/* Humid Normal */}
+        {/* <Grid item xs={6}>
+                  <Typography variant="h5" align="left">
+                    Normal
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="h5" align="right">
+                    { `${humidRanges["normal_humid_range"]} %` }
+                  </Typography>
+                </Grid> */}
+
+        {/* </Grid>
+              
+            </CardContent>
+          </Card>
+        </Grid> */}
+
+        {/* Smoke Limits */}
+        {/* <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
+          <Card
+            sx={{ minWidth: 50 }}
+            className={`custom-card ${isTempPulsating ? "pulsating" : ""}`}
+          >
+            <CardContent
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Grid container spacing={1}> */}
+
+        {/* Smoke Limit */}
+        {/* <Grid item xs={6}>
+                  <Typography variant="h5" align="left">
+                    Limit
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="h5" align="right">
+                    {`${smokeRanges["smoke_limit"]}` }
+                  </Typography>
+                </Grid>
+              </Grid> */}
+
+        {/* </CardContent>
+          </Card>
+        </Grid> */}
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card
             sx={{ minWidth: 50 }}
@@ -654,7 +953,7 @@ const AdminDashboardTab = () => {
                 alignItems: "center",
               }}
             >
-              <Grid container spacing={2}>
+              <Grid container>
                 <Grid
                   item
                   xs={12}
@@ -669,8 +968,19 @@ const AdminDashboardTab = () => {
                     name="Temperature"
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  {/* <TemperatureGraph
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    p: 0,
+                  }}
+                >
+                  <Typography variant="h2">{data.Temperature} °C</Typography>
+                </Grid>
+
+                {/* <TemperatureGraph
                       title="Live Temperature Monitor"
                       chart={{
                         labels: [
@@ -696,11 +1006,35 @@ const AdminDashboardTab = () => {
                         ],
                       }}
                     /> */}
-                  <TemperatureGraph
-                    title="Live Temperature Monitor"
-                    chartInfo={mainGraphData.temperature}
-                  />
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    mt: 5
+                  }}
+                >
+                  <LoadingButton
+                    loading={false}
+                    loadingPosition="start"
+                    startIcon={<BarChartIcon />}
+                    variant="contained"
+                    onClick={handleTempGraphButtonClick}
+                  >
+                    View Graph / History
+                  </LoadingButton>
                 </Grid>
+
+                {showTempGraph && (
+                  <Grid item xs={12}>
+                    <TemperatureGraph
+                      title="Live Temperature Monitor"
+                      chartInfo={mainGraphData.temperature}
+                    />
+                  </Grid>
+                )}
               </Grid>
             </CardContent>
           </Card>
@@ -717,7 +1051,7 @@ const AdminDashboardTab = () => {
                 alignItems: "center",
               }}
             >
-              <Grid container spacing={2}>
+              <Grid container>
                 <Grid
                   item
                   xs={12}
@@ -732,11 +1066,46 @@ const AdminDashboardTab = () => {
                     name="Humidity"
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  <HumidityGraph
-                    title="Live Humidity Monitor"
-                    chartInfo={mainGraphData.humidity}
-                    // chart={{
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    p: 0,
+                  }}
+                >
+                  <Typography variant="h2">{data.Humidity} %</Typography>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    mt: 5
+                  }}
+                >
+                  <LoadingButton
+                    loading={false}
+                    loadingPosition="start"
+                    startIcon={<BarChartIcon />}
+                    variant="contained"
+                    onClick={handleHumidityGraphButtonClick}
+                  >
+                    View Graph / History
+                  </LoadingButton>
+                </Grid>
+                {showHumidGraph && (
+                  <Grid item xs={12}>
+                    <HumidityGraph
+                      title="Live Humidity Monitor"
+                      chartInfo={mainGraphData.humidity}
+                    />
+                  </Grid>
+                )}
+                {/* // chart={{
                     //   labels: [
                     //     "01/01/2024",
                     //     "02/01/2024",
@@ -758,9 +1127,7 @@ const AdminDashboardTab = () => {
                     //       data: [44.5, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
                     //     },
                     //   ],
-                    // }}
-                  />
-                </Grid>
+                    // }} */}
               </Grid>
             </CardContent>
           </Card>
@@ -785,14 +1152,47 @@ const AdminDashboardTab = () => {
                 alignItems: "center",
               }}
             >
-              <Grid container spacing={2}>
+              <Grid container>
                 <Grid item xs={12}>
                   <QuickBanner value={data.Smoke} name="Smoke" />
                 </Grid>
-                <Grid item xs={12}>
-                  <SmokeGraph
-                    chartInfo={mainGraphData.smoke}
-                    // title="Live Smoke Detection Monitor"
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    p: 0,
+                  }}
+                >
+                  <Typography variant="h2">{data.Smoke}</Typography>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    mt: 5
+                  }}
+                >
+                  <LoadingButton
+                    loading={false}
+                    loadingPosition="start"
+                    startIcon={<BarChartIcon />}
+                    variant="contained"
+                    onClick={handleSmokeGraphButtonClick}
+                  >
+                    View Graph / History
+                  </LoadingButton>
+                </Grid>
+                {showSmokeGraph && (
+                  <Grid item xs={12}>
+                    <SmokeGraph chartInfo={mainGraphData.smoke} />
+                  </Grid>
+                )}
+                {/* // title="Live Smoke Detection Monitor"
                     // chart={{
                     //   labels: [
                     //     "01/01/2024",
@@ -820,9 +1220,7 @@ const AdminDashboardTab = () => {
                     //       ],
                     //     },
                     //   ],
-                    // }}
-                  />
-                </Grid>
+                    // }} */}
               </Grid>
             </CardContent>
           </Card>
@@ -1102,10 +1500,6 @@ const AdminDashboardTab = () => {
         key={vertical + horizontal}
         autoHideDuration={4000}
       />
-      {/* <Alert severity="error" sx={{ display: isPlaying? 'block' : 'none' }}>
-        <AlertTitle>Error</AlertTitle>
-        This is an error Alert with a scary title.
-      </Alert> */}
     </>
   );
 };

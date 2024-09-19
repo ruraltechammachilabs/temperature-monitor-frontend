@@ -119,3 +119,17 @@ export const shutdownSystem = async () => {
     }, 2000);
   });
 };
+
+export const stopPiProgram = async () => {
+  const docRef = doc(db, "data_read", "stop_pi");
+
+  return await updateDoc(docRef, {
+    status: "stop",
+  }).then(() => {
+    setTimeout(async () => {
+      await updateDoc(docRef, {
+        status: "sto",
+      });
+    }, 2000);
+  });
+};

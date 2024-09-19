@@ -97,7 +97,6 @@ const SmokeRangeSettings = () => {
       try {
         const smokeData = await getSmokeRanges();
         setSmokeRanges(smokeData);
-        console.log(smokeData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -112,7 +111,6 @@ const SmokeRangeSettings = () => {
   }, [smokeRanges]);
 
   const handleSmokeLimitsSubmit = () => {
-    console.log(smokeLimit);
     setSmokeRange(smokeLimit).then(() => {
       console.log("Smoke Limit updated successfully !");
       setState((prev) => {
@@ -206,7 +204,7 @@ const SmokeRangeSettings = () => {
                         valueLabelDisplay="auto"
                         color="primary"
                         min={0}
-                        max={10000}
+                        max={20000}
                         step={20}
                         marks={[
                           {
@@ -214,8 +212,8 @@ const SmokeRangeSettings = () => {
                             label: "0",
                           },
                           {
-                            value: 10000,
-                            label: "10k",
+                            value: 20000,
+                            label: "20K",
                           },
                         ]}
                         onChange={(event) => setSmokeLimit(event.target.value)}
@@ -233,7 +231,7 @@ const SmokeRangeSettings = () => {
                         inputProps={{
                           step: 1,
                           min: 0,
-                          max: 250,
+                          max: 20000,
                           type: "number",
                         }}
                         disabled={!isEdit}

@@ -29,6 +29,7 @@ const QuickBanner = ({ percent, value, name }) => {
   /* Guage chart declaration for Smoke */
   const maxSmokeValue = 10000;
   const [smokePercentage, setSmokePercentage] = useState(0);
+  const [chartValue, setChartValue] = useState("");
 
   useEffect(() => {
     let percentage = 0;
@@ -88,27 +89,37 @@ const QuickBanner = ({ percent, value, name }) => {
               needleBaseColor="#c8ccca"
               colors={["#4caf50", "#FFC371", "#FF5F6D"]}
               nrOfLevels={3}
-              formatTextValue={() => value + ""}
+              formatTextValue={() => { setChartValue(value + ""); return value + ""}}
               textColor={memoisedTextColor}
+              hideText
             />
           </Grid>
         ) : (
-          <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
-            <GaugeChart
-              style={{
-                height: "auto",
-                width: "80%",
-              }}
-              percent={percent}
-              animDelay={0}
-              needleColor={memoisedNeedleColor}
-              needleBaseColor="#c8ccca"
-              colors={["#a2cf6e", "#4caf50", "#FFC371", "#FF5F6D"]}
-              nrOfLevels={4}
-              formatTextValue={() => setValueByType(value)}
-              textColor={memoisedTextColor}
-            />
+          <>
+          <Grid container>
+            <Grid
+              item
+              xs={12}
+              sx={{ display: "flex", justifyContent: "center" }}
+            >
+              <GaugeChart
+                style={{
+                  height: "auto",
+                  width: "80%",
+                }}
+                percent={percent}
+                animDelay={0}
+                needleColor={memoisedNeedleColor}
+                needleBaseColor="#c8ccca"
+                colors={["#a2cf6e", "#4caf50", "#FFC371", "#FF5F6D"]}
+                nrOfLevels={4}
+                formatTextValue={() => { setChartValue(setValueByType(value)); return setValueByType(value)  } }
+                textColor={memoisedTextColor}
+                hideText
+              />
+            </Grid>
           </Grid>
+          </>
         )}
       </Grid>
     </>

@@ -85,7 +85,6 @@ const TemperatureDashboardUser = () => {
   useEffect(() => {
     const fetchData = async () => {
       const userdata = await getUserByUid(currentUser.email);
-      console.log(userdata);
       if (userdata.role === "admin") setIsUser(true)
         else setIsUser(false)
     };

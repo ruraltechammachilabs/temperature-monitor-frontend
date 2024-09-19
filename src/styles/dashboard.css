@@ -56,6 +56,7 @@
 /* Pulsating Color */
 .pulsating {
   animation: pulse 1s infinite;
+  color: white
 }
 
 @keyframes pulse {
