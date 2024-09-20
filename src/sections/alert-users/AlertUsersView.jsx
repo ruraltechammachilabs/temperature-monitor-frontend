@@ -28,6 +28,7 @@ import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
+import SmsIcon from '@mui/icons-material/Sms';
 
 /* Styles */
 import "../../styles/dashboard.css";
@@ -63,7 +64,7 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 		{
 			label: "Calls",
 			icon: <PhoneForwardedIcon />,
-		},
+		}
 	];
 
 	useEffect(() => {

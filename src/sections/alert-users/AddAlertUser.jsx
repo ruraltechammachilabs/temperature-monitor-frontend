@@ -83,6 +83,8 @@ const AddAlertUser = ({ closeModal }) => {
       updates: checked,
     };
 
+    checked.push(4) // Manual trigger SMS (Added by default)
+
     await addAlertUserToFirestore(user).then((counts) => {
       addAlertUser(user, counts).then((isAdded) => {
 		if(isAdded) {

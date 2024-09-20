@@ -80,12 +80,14 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
   const stageDocRef = doc(db, "data_read", "stage_sms");
   const powerDocRef = doc(db, "data_read", "power_sms");
   const callDocRef = doc(db, "data_read", "call");
+  const triggerDocRef = doc(db, "data_read", "trig_sms");
 
   /* Counts */
   let regularCount = 0;
   let stageCount = 0;
   let powerCount = 0;
   let callCount = 0;
+  let triggerCount = 0;
 
   let counts = {};
 
@@ -95,6 +97,7 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
   const stageDocSnap = await getDoc(stageDocRef);
   const powerDocSnap = await getDoc(powerDocRef);
   const callDocSnap = await getDoc(callDocRef);
+  const triggerDocSnap = await getDoc(triggerDocRef)
 
   /* Set Counts */
   if (regularDocSnap.exists()) {
@@ -121,6 +124,13 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
   if (callDocSnap.exists()) {
     const calls = callDocSnap.data();
     callCount = Object.keys(calls).length;
+  } else {
+    console.log("No such document named call !");
+  }
+
+  if (triggerDocSnap.exists()) {
+    const trigger = triggerDocSnap.data();
+    callCount = Object.keys(trigger).length;
   } else {
     console.log("No such document named call !");
   }
@@ -216,6 +226,27 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
           });
         break;
       }
+      case 4: {
+        let triggerName = "person_" + (triggerCount + 1);
+        counts["triggerCount"] = triggerCount + 1;
+        updateDoc(
+          callDocRef,
+          {
+            // [newAlertUser.name]: newAlertUser.phone,
+            [triggerName]: newAlertUser.phone,
+          },
+          {
+            merge: true,
+          }
+        )
+          .then(() => {
+            console.log("Trigger SMS Document updated successfully");
+          })
+          .catch((error) => {
+            console.error("Error updating document: ", error);
+          });
+        break;
+      }
       default:
         console.log("Not a valid number. Please provide a valid number.");
     }
@@ -232,6 +263,7 @@ export const deleteAlertUser = async (alertUser) => {
   const stageDocRef = doc(db, "data_read", "stage_sms");
   const powerDocRef = doc(db, "data_read", "power_sms");
   const callDocRef = doc(db, "data_read", "call");
+  const triggerDocRef = doc(db, "data_read", "trig_sms");
 
   alertUser.updates.map((type) => {
     switch (type) {
@@ -285,6 +317,20 @@ export const deleteAlertUser = async (alertUser) => {
         })
           .then(() => {
             console.log("User Deleted from Call Document successfully");
+          })
+          .catch((error) => {
+            console.error("Error updating document: ", error);
+          });
+        break;
+      }
+      case 4: {
+        const name = "person_" + alertUser.triggerCount;
+        updateDoc(triggerDocRef, {
+          // [alertUser.name]: deleteField()
+          [name]: deleteField(),
+        })
+          .then(() => {
+            console.log("User Deleted from Trigger SMS Document successfully");
           })
           .catch((error) => {
             console.error("Error updating document: ", error);
