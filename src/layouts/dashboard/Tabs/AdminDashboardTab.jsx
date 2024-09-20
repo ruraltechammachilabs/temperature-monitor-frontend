@@ -261,7 +261,7 @@ const AdminDashboardTab = () => {
       if (ranges === null || ranges === undefined) {
         loadRangeData().then(() => {
           /* Play Alert Sound if Temp > Limit  */
-          if (newData.Temperature > ranges.Temperature) {
+          if (newData.Temperature > tempRanges.Temperature) {
             handlePlay1();
             setIsTempPulsating(true);
           } else {
@@ -270,16 +270,16 @@ const AdminDashboardTab = () => {
           }
 
           /* Humidity */
-          if (newData.Humidity > ranges.Humidity) {
-            handlePlay2();
-            setIsHumidityPulsating(true);
-          } else {
-            handlePause2();
-            setIsHumidityPulsating(false);
-          }
+          // if (newData.Humidity > humidRanges.Humidity) {
+          //   handlePlay2();
+          //   setIsHumidityPulsating(true);
+          // } else {
+          //   handlePause2();
+          //   setIsHumidityPulsating(false);
+          // }
 
           /* Smoke */
-          if (newData.Smoke > ranges.Smoke) {
+          if (newData.Smoke > smokeRanges.Smoke) {
             handlePlay3();
             setIsSmokePulsating(true);
           } else {
@@ -308,13 +308,13 @@ const AdminDashboardTab = () => {
 
         /* Humidity */
         // if (newData.Humidity > ranges.Humidity) {
-        if (newData.Humidity > humidRanges.normal_humid_range) {
-          handlePlay2();
-          setIsHumidityPulsating(true);
-        } else {
-          handlePause2();
-          setIsHumidityPulsating(false);
-        }
+        // if (newData.Humidity > humidRanges.normal_humid_range) {
+        //   handlePlay2();
+        //   setIsHumidityPulsating(true);
+        // } else {
+        //   handlePause2();
+        //   setIsHumidityPulsating(false);
+        // }
 
         /* Smoke */
         // if (newData.Smoke > ranges.Smoke) {
@@ -343,6 +343,7 @@ const AdminDashboardTab = () => {
   useEffect(() => {
     /* Play Alert Sound if Temp > Limit  */
     // if (newData.Temperature > ranges.Temperature) {
+    console.log(data)
     if (data.Temperature > tempRanges.high_temp_range) {
       handlePlay1();
       setIsTempPulsating(true);
@@ -350,19 +351,19 @@ const AdminDashboardTab = () => {
       handlePause1();
       setIsTempPulsating(false);
     }
-  }, [tempRanges]);
+  }, [data, tempRanges]);
 
-  useEffect(() => {
-    /* Humidity */
-    // if (newData.Humidity > ranges.Humidity) {
-    if (data.Humidity > humidRanges.normal_humid_range) {
-      handlePlay2();
-      setIsHumidityPulsating(true);
-    } else {
-      handlePause2();
-      setIsHumidityPulsating(false);
-    }
-  }, [humidRanges]);
+  // useEffect(() => {
+  //   /* Humidity */
+  //   // if (newData.Humidity > ranges.Humidity) {
+  //   if (data.Humidity > humidRanges.normal_humid_range) {
+  //     handlePlay2();
+  //     setIsHumidityPulsating(true);
+  //   } else {
+  //     handlePause2();
+  //     setIsHumidityPulsating(false);
+  //   }
+  // }, [humidRanges]);
 
   useEffect(() => {
     /* Smoke */
@@ -374,7 +375,7 @@ const AdminDashboardTab = () => {
       handlePause3();
       setIsSmokePulsating(false);
     }
-  }, [smokeRanges]);
+  }, [data, smokeRanges]);
 
   /* Fetch Live Graph Data */
   useEffect(() => {
@@ -391,6 +392,8 @@ const AdminDashboardTab = () => {
   useEffect(() => {
     const unsubscribe = listenForTempRangeChanges((newData) => {
       const ranges = JSON.parse(localStorage.getItem("ranges"));
+
+      console.log(ranges)
 
       if (ranges !== null && ranges !== undefined) {
         const newRanges = {
@@ -531,11 +534,11 @@ const AdminDashboardTab = () => {
   const checkIfMuted = (isMute) => {
     if (isMute) {
       audio1Ref.current.muted = true;
-      audio2Ref.current.muted = true;
+      // audio2Ref.current.muted = true;
       audio3Ref.current.muted = true;
     } else {
       audio1Ref.current.muted = false;
-      audio2Ref.current.muted = false;
+      // audio2Ref.current.muted = false;
       audio3Ref.current.muted = false;
     }
   };
@@ -573,7 +576,7 @@ const AdminDashboardTab = () => {
             <AlertTitle style={{ textAlign: "center" }}>WARNING</AlertTitle>
             CRITICAL ALERT - TEMPERATURE HIGH
           </Alert>
-          <Alert
+          {/* <Alert
             severity="error"
             // sx={{ display: isTempPulsating ? "block" : "none" }}
             sx={{
@@ -585,7 +588,7 @@ const AdminDashboardTab = () => {
           >
             <AlertTitle style={{ textAlign: "center" }}>WARNING</AlertTitle>
             CRITICAL ALERT - HUMIDITY HIGH
-          </Alert>
+          </Alert> */}
           <Alert
             severity="error"
             // sx={{ display: isTempPulsating ? "block" : "none" }}
@@ -1042,7 +1045,8 @@ const AdminDashboardTab = () => {
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card
             sx={{ minWidth: 50 }}
-            className={`custom-card ${isHumidityPulsating ? "pulsating" : ""}`}
+            // className={`custom-card ${isHumidityPulsating ? "pulsating" : ""}`}
+            className="custom-card"
           >
             <CardContent
               sx={{

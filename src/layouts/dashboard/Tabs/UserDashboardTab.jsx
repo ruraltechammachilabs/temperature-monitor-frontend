@@ -206,13 +206,13 @@ const UserDashboardTab = () => {
 
           /* Humidity */
           // if (newData.Humidity > ranges.Humidity) {
-          if (newData.Humidity > humidRanges.normal_humid_range) {
-            handlePlay2();
-            setIsHumidityPulsating(true);
-          } else {
-            handlePause2();
-            setIsHumidityPulsating(false);
-          }
+          // if (newData.Humidity > humidRanges.normal_humid_range) {
+          //   handlePlay2();
+          //   setIsHumidityPulsating(true);
+          // } else {
+          //   handlePause2();
+          //   setIsHumidityPulsating(false);
+          // }
 
           /* Smoke */
           // if (newData.Smoke > ranges.Smoke) {
@@ -233,7 +233,7 @@ const UserDashboardTab = () => {
         });
       } else {
         /* Play Alert Sound if Temp > Limit  */
-        if (newData.Temperature > ranges.Temperature) {
+        if (newData.Temperature > tempRanges.Temperature) {
           handlePlay1();
           setIsTempPulsating(true);
         } else {
@@ -242,16 +242,16 @@ const UserDashboardTab = () => {
         }
 
         /* Humidity */
-        if (newData.Humidity > ranges.Humidity) {
-          handlePlay2();
-          setIsHumidityPulsating(true);
-        } else {
-          handlePause2();
-          setIsHumidityPulsating(false);
-        }
+        // if (newData.Humidity > humidRanges.Humidity) {
+        //   handlePlay2();
+        //   setIsHumidityPulsating(true);
+        // } else {
+        //   handlePause2();
+        //   setIsHumidityPulsating(false);
+        // }
 
         /* Smoke */
-        if (newData.Smoke > ranges.Smoke) {
+        if (newData.Smoke > smokeRanges.Smoke) {
           handlePlay3();
           setIsSmokePulsating(true);
         } else {
@@ -283,19 +283,19 @@ const UserDashboardTab = () => {
       handlePause1();
       setIsTempPulsating(false);
     }
-  }, [tempRanges]);
+  }, [data, tempRanges]);
 
-  useEffect(() => {
-    /* Humidity */
-    // if (newData.Humidity > ranges.Humidity) {
-    if (data.Humidity > humidRanges.normal_humid_range) {
-      handlePlay2();
-      setIsHumidityPulsating(true);
-    } else {
-      handlePause2();
-      setIsHumidityPulsating(false);
-    }
-  }, [humidRanges]);
+  // useEffect(() => {
+  //   /* Humidity */
+  //   // if (newData.Humidity > ranges.Humidity) {
+  //   if (data.Humidity > humidRanges.normal_humid_range) {
+  //     handlePlay2();
+  //     setIsHumidityPulsating(true);
+  //   } else {
+  //     handlePause2();
+  //     setIsHumidityPulsating(false);
+  //   }
+  // }, [humidRanges]);
 
   useEffect(() => {
     /* Smoke */
@@ -307,7 +307,7 @@ const UserDashboardTab = () => {
       handlePause3();
       setIsSmokePulsating(false);
     }
-  }, [smokeRanges]);
+  }, [data, smokeRanges]);
 
   /* Fetch Live Graph Data */
   useEffect(() => {
@@ -415,11 +415,11 @@ const UserDashboardTab = () => {
   const checkIfMuted = (isMute) => {
     if (isMute) {
       audio1Ref.current.muted = true;
-      audio2Ref.current.muted = true;
+      // audio2Ref.current.muted = true;
       audio3Ref.current.muted = true;
     } else {
       audio1Ref.current.muted = false;
-      audio2Ref.current.muted = false;
+      // audio2Ref.current.muted = false;
       audio3Ref.current.muted = false;
     }
   };
@@ -456,7 +456,7 @@ const UserDashboardTab = () => {
             <AlertTitle style={{ textAlign: "center" }}>WARNING</AlertTitle>
             CRITICAL ALERT - TEMPERATURE HIGH
           </Alert>
-          <Alert
+          {/* <Alert
             severity="error"
             sx={{
               display: isHumidityPulsating ? "flex" : "none",
@@ -467,7 +467,7 @@ const UserDashboardTab = () => {
           >
             <AlertTitle style={{ textAlign: "center" }}>WARNING</AlertTitle>
             CRITICAL ALERT - HUMIDITY HIGH
-          </Alert>
+          </Alert> */}
           <Alert
             severity="error"
             sx={{
@@ -753,7 +753,8 @@ const UserDashboardTab = () => {
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card
             sx={{ minWidth: 50 }}
-            className={`custom-card ${isHumidityPulsating ? "pulsating" : ""}`}
+            // className={`custom-card ${isHumidityPulsating ? "pulsating" : ""}`}
+            className="custom-card"
           >
             <CardContent
               sx={{
