@@ -77,13 +77,14 @@ const AddAlertUser = ({ closeModal }) => {
 
   /* Submit */
   const handleAddUserClick = async () => {
+    checked.push(4) // Manual trigger SMS (Added by default)
+    
     const user = {
       name,
       phone: "+91" + phone,
       updates: checked,
     };
 
-    checked.push(4) // Manual trigger SMS (Added by default)
 
     await addAlertUserToFirestore(user).then((counts) => {
       addAlertUser(user, counts).then((isAdded) => {

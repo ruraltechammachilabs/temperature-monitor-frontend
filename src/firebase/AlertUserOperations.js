@@ -76,6 +76,7 @@ export const addAlertUser = async (newAlertUser, counts) => {
 };
 
 export const addAlertUserToFirestore = async (newAlertUser) => {
+
   const regularDocRef = doc(db, "data_read", "regular_sms");
   const stageDocRef = doc(db, "data_read", "stage_sms");
   const powerDocRef = doc(db, "data_read", "power_sms");
@@ -130,10 +131,12 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
 
   if (triggerDocSnap.exists()) {
     const trigger = triggerDocSnap.data();
-    callCount = Object.keys(trigger).length;
+    triggerCount = Object.keys(trigger).length;
   } else {
     console.log("No such document named call !");
   }
+
+
 
   /* Add Number */
   newAlertUser.updates.map((type) => {
@@ -230,7 +233,7 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
         let triggerName = "person_" + (triggerCount + 1);
         counts["triggerCount"] = triggerCount + 1;
         updateDoc(
-          callDocRef,
+          triggerDocRef,
           {
             // [newAlertUser.name]: newAlertUser.phone,
             [triggerName]: newAlertUser.phone,
