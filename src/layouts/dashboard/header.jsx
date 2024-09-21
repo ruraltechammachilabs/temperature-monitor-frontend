@@ -7,7 +7,6 @@ import classNames from 'classnames';
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import { useTheme } from "@mui/material/styles";
-import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import LightModeIcon from '@mui/icons-material/LightMode';
 import NightsStayIcon from '@mui/icons-material/NightsStay';
@@ -16,7 +15,6 @@ import Box from "@mui/material/Box";
 
 /* Components */
 import { grey } from "../../theme/palette"
-import Iconify from '/src/components/iconify'
 import { HEADER } from "./config-layout"
 import { useResponsive } from "../../hooks/use-responsive"
 import AmritaLogo from "/assets/images/logos/amrita-logo.png"
@@ -70,7 +68,7 @@ export default function Header({ onOpenNav }) {
           sx={{ flexGrow: 1 }}
           color={textDarkColor}
         >
-          Temperature Monitoring
+          Data Center Monitoring
         </Typography>
       </Box>
 

@@ -34,6 +34,7 @@ import {
   listenForTempRangeChanges,
   listenForHumidRangeChanges,
   listenForSmokeRangeChanges,
+  convertDateStringToMilliseconds
 } from "../../../firebase/operations";
 import {
   getHumidRanges,
@@ -66,14 +67,19 @@ const UserDashboardTab = () => {
 
   const [action, setAction] = useState("");
   const [isTempPulsating, setIsTempPulsating] = useState(false);
-  const [isHumidityPulsating, setIsHumidityPulsating] = useState(false);
   const [isSmokePulsating, setIsSmokePulsating] = useState(false);
+  // const [isHumidityPulsating, setIsHumidityPulsating] = useState(false);
 
   /* Graphs */
   const [mainGraphData, setMainGraphData] = useState([]);
   const [showTempGraph, setShowTempGraph] = useState(false);
   const [showHumidGraph, setShowHumidGraph] = useState(false);
   const [showSmokeGraph, setShowSmokeGraph] = useState(false);
+
+  /* system status */
+  const [systemStatus, setSystemStatus] = useState("online");
+  const intervalRef = useRef(null);
+  const timeoutRef = useRef(null);
 
   /* snackbar alert */
   const [state, setState] = useState({
@@ -109,13 +115,13 @@ const UserDashboardTab = () => {
     audio1Ref.current.pause();
   };
 
-  const handlePlay2 = () => {
-    audio2Ref.current.play();
-  };
+  // const handlePlay2 = () => {
+  //   audio2Ref.current.play();
+  // };
 
-  const handlePause2 = () => {
-    audio2Ref.current.pause();
-  };
+  // const handlePause2 = () => {
+  //   audio2Ref.current.pause();
+  // };
 
   const handlePlay3 = () => {
     audio3Ref.current.play();
@@ -405,6 +411,61 @@ const UserDashboardTab = () => {
     return () => unsubscribe();
   }, []);
 
+  /* Check System Status */
+
+  useEffect(() => {
+    if (data) {
+
+      // const date = new Date(data.Timestamp);
+
+      // Get the timestamp in milliseconds
+      // const timestampMilliseconds = date.getTime();
+
+      // Run the 2-second interval check and stop it after 2 minutes
+      startChecking();
+
+      // Cleanup both the interval and the timeout when `data` is updated or component unmounts
+      return () => {
+        clearInterval(intervalRef.current);
+        clearTimeout(timeoutRef.current);
+      };
+    }
+  }, [data]);
+
+  const startChecking = () => {
+    // Clear any previous intervals and timeouts
+    clearInterval(intervalRef.current);
+    clearTimeout(timeoutRef.current);
+
+    // Perform an immediate system check
+    performSystemCheck();
+
+    // Start the interval to check every 2 seconds
+    intervalRef.current = setInterval(() => {
+      performSystemCheck();
+    }, 2000);
+
+    // Stop the interval after 2 minutes
+    timeoutRef.current = setTimeout(() => {
+      clearInterval(intervalRef.current); // Clear the interval after 2 minutes
+      // console.log(
+      //   "2-minute checking ended. No further checks until data is updated."
+      // );
+    }, 120000);
+  };
+
+  const performSystemCheck = async () => {
+    // logic to check if the system is on or off
+    const currentTimestamp = await convertDateStringToMilliseconds(data.Timestamp)
+    const timestampDiff = Date.now() - currentTimestamp
+
+    if (data && (timestampDiff < 120000)) {
+      setSystemStatus("online");
+    } else {
+      setSystemStatus("offline");
+    }
+  };
+
   /* Audio Actions */
 
   const handleAudioMute = () => {
@@ -440,7 +501,7 @@ const UserDashboardTab = () => {
   return (
     <>
       <audio ref={audio1Ref} src="/assets/sounds/alarm-2.mp3" loop />
-      <audio ref={audio2Ref} src="/assets/sounds/alarm-2.mp3" loop />
+      {/* <audio ref={audio2Ref} src="/assets/sounds/alarm-2.mp3" loop /> */}
       <audio ref={audio3Ref} src="/assets/sounds/alarm-1.wav" loop />
       <Grid container spacing={1}>
         <Grid item xs={12}>

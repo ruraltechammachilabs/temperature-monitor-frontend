@@ -104,6 +104,28 @@ export const convertToTimestamp = (dateTimeString) => {
   return date.getTime();
 };
 
+export const convertDateStringToMilliseconds = async (dateString) => {
+  // const dateString = "20/09/2024 14:14:28";
+  if(dateString !== "" && dateString !== undefined) {
+    // Split the date and time parts
+    const [datePart, timePart] = dateString.split(" ");
+  
+    // Extract day, month, and year from the date part
+    const [day, month, year] = datePart.split("/").map(Number);
+  
+    // Extract hours, minutes, and seconds from the time part
+    const [hours, minutes, seconds] = timePart.split(":").map(Number);
+  
+    // Create a Date object using year, month (subtract 1 because months are 0-indexed), and day
+    const dateObj = new Date(year, month - 1, day, hours, minutes, seconds);
+  
+    // Convert the date object to milliseconds since Unix epoch
+    const milliseconds = dateObj.getTime();
+  
+    return milliseconds;
+  } else return Date.now() 
+};
+
 export const getChartData = async (sensorType, callback) => {
   const dbRef = ref(fbDB, "monitor");
 
@@ -179,7 +201,7 @@ export const getChartDataByDateTime = async () => {
       const liveArr = {
         temperature: [],
         humidity: [],
-        smoke: []
+        smoke: [],
       };
 
       const tempChartData = monitorData.map((item) => {
@@ -197,14 +219,14 @@ export const getChartDataByDateTime = async () => {
         return tempData;
       });
 
-      liveArr.temperature = tempChartData
-      liveArr.humidity = humidChartData
-      liveArr.smoke = smokeChartData
+      liveArr.temperature = tempChartData;
+      liveArr.humidity = humidChartData;
+      liveArr.smoke = smokeChartData;
 
-      return liveArr
+      return liveArr;
     } else {
       console.log("No recent data found");
-      return []
+      return [];
     }
   } catch (error) {
     console.error("Error fetching recent data:", error);

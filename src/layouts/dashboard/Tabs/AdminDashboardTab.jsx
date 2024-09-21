@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 /* React */
 // import { useContext } from "react";
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef, useContext, forwardRef } from "react";
 
 /* MUI */
 import {
@@ -23,6 +23,11 @@ import {
   Snackbar,
   Alert,
   AlertTitle,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Slide,
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 
@@ -35,13 +40,14 @@ import PowerSettingsNewRoundedIcon from "@mui/icons-material/PowerSettingsNewRou
 import RestartAltRoundedIcon from "@mui/icons-material/RestartAltRounded";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import BarChartIcon from '@mui/icons-material/BarChart';
+import BarChartIcon from "@mui/icons-material/BarChart";
 // import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 // import TrendingFlatOutlinedIcon from "@mui/icons-material/TrendingFlatOutlined";
 // import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 /* Hooks */
 import { useResponsive } from "../../../hooks/use-responsive";
+import { useNetworkStatus } from "../../../hooks/use-network-status";
 // import { useSelector, useDispatch } from 'react-redux'
 
 /* Styles */
@@ -79,9 +85,14 @@ import {
   convertToTimestamp,
   setRealtimeValues,
   getChartDataByDateTime,
+  convertDateStringToMilliseconds
 } from "../../../firebase/operations";
 // import { setThreshold } from "../../../services/monitoringSlice";
 // import { GraphDataContext } from "../../../Providers/GraphDataProvider";
+
+const Transition = forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const AdminDashboardTab = () => {
   const mdUp = useResponsive("up", "md");
@@ -89,17 +100,25 @@ const AdminDashboardTab = () => {
 
   const { isNewAlertUserAdded, setIsAlertUserRemoved, isAlertUserRemoved } =
     useContext(GlobalDataContext);
-  // const { setTempGraphData, setHumidGraphData, setSmokeGraphData } = useContext(GraphDataContext)
+  // const { isOnline } = useNetworkStatus();
 
   const [action, setAction] = useState("");
   const [tempRanges, setTempRanges] = useState({});
   const [humidRanges, setHumidRanges] = useState({});
   const [smokeRanges, setSmokeRanges] = useState({});
 
+  /* system status */
+  const [systemStatus, setSystemStatus] = useState("online");
+  const intervalRef = useRef(null);
+  const timeoutRef = useRef(null);
+  // const [networkStatus, setNetworkStatus] = useState("online");
+  // const [timestampDiff, setTimestampDiff] = useState(0);
+  // const previousTimestamp = useRef(null); // To store the previous timestamp
+
   /* Alert Variables */
   const [isTempPulsating, setIsTempPulsating] = useState(false);
-  const [isHumidityPulsating, setIsHumidityPulsating] = useState(false);
   const [isSmokePulsating, setIsSmokePulsating] = useState(false);
+  // const [isHumidityPulsating, setIsHumidityPulsating] = useState(false);
 
   const [alertUsers, setAlertUsers] = useState([]);
 
@@ -158,9 +177,21 @@ const AdminDashboardTab = () => {
     setOpen(false);
   };
 
+  /* System On Off Dialog */
+
+  const [openSystemStatusDialog, setOpenSystemStatusDialog] = useState(false);
+
+  // const handleClickOpenSystemStatusDialog = () => {
+  //   setOpenSystemStatusDialog(true);
+  // };
+
+  const handleCloseSystemStatusDialog = () => {
+    setOpenSystemStatusDialog(false);
+  };
+
   /* Audio */
   const audio1Ref = useRef(null);
-  const audio2Ref = useRef(null);
+  // const audio2Ref = useRef(null);
   const audio3Ref = useRef(null);
   const [isMuted, setIsMuted] = useState(false);
 
@@ -172,13 +203,13 @@ const AdminDashboardTab = () => {
     audio1Ref.current.pause();
   };
 
-  const handlePlay2 = () => {
-    audio2Ref.current.play();
-  };
+  // const handlePlay2 = () => {
+  //   audio2Ref.current.play();
+  // };
 
-  const handlePause2 = () => {
-    audio2Ref.current.pause();
-  };
+  // const handlePause2 = () => {
+  //   audio2Ref.current.pause();
+  // };
 
   const handlePlay3 = () => {
     audio3Ref.current.play();
@@ -256,6 +287,15 @@ const AdminDashboardTab = () => {
 
     const unsubscribe = listenForDocumentChanges((newData) => {
       setData(newData);
+
+      /* Check & Update System Status */
+
+      // if (isOnline) {
+      //   setNetworkStatus("online");
+      // } else {
+      //   setNetworkStatus("offline");
+      // }
+
       const ranges = JSON.parse(localStorage.getItem("ranges"));
 
       if (ranges === null || ranges === undefined) {
@@ -343,7 +383,6 @@ const AdminDashboardTab = () => {
   useEffect(() => {
     /* Play Alert Sound if Temp > Limit  */
     // if (newData.Temperature > ranges.Temperature) {
-    console.log(data)
     if (data.Temperature > tempRanges.high_temp_range) {
       handlePlay1();
       setIsTempPulsating(true);
@@ -392,8 +431,6 @@ const AdminDashboardTab = () => {
   useEffect(() => {
     const unsubscribe = listenForTempRangeChanges((newData) => {
       const ranges = JSON.parse(localStorage.getItem("ranges"));
-
-      console.log(ranges)
 
       if (ranges !== null && ranges !== undefined) {
         const newRanges = {
@@ -499,6 +536,62 @@ const AdminDashboardTab = () => {
     }
   }, [isNewAlertUserAdded, isAlertUserRemoved]);
 
+  /* Check System Status */
+
+  useEffect(() => {
+    if (data) {
+
+      // const date = new Date(data.Timestamp);
+
+      // Get the timestamp in milliseconds
+      // const timestampMilliseconds = date.getTime();
+
+      // Run the 2-second interval check and stop it after 2 minutes
+      startChecking();
+
+      // Cleanup both the interval and the timeout when `data` is updated or component unmounts
+      return () => {
+        clearInterval(intervalRef.current);
+        clearTimeout(timeoutRef.current);
+      };
+    }
+  }, [data]);
+
+  const startChecking = () => {
+    // Clear any previous intervals and timeouts
+    clearInterval(intervalRef.current);
+    clearTimeout(timeoutRef.current);
+
+    // Perform an immediate system check
+    performSystemCheck();
+
+    // Start the interval to check every 2 seconds
+    intervalRef.current = setInterval(() => {
+      performSystemCheck();
+    }, 2000);
+
+    // Stop the interval after 2 minutes
+    timeoutRef.current = setTimeout(() => {
+      clearInterval(intervalRef.current); // Clear the interval after 2 minutes
+      // console.log(
+      //   "2-minute checking ended. No further checks until data is updated."
+      // );
+    }, 120000);
+  };
+
+  const performSystemCheck = async () => {
+    // Perform your logic to check if the system is on or off
+    // Example: Set the status based on a condition in the data object
+    const currentTimestamp = await convertDateStringToMilliseconds(data.Timestamp)
+    const timestampDiff = Date.now() - currentTimestamp
+
+    if (data && (timestampDiff < 120000)) {
+      setSystemStatus("online");
+    } else {
+      setSystemStatus("offline");
+    }
+  };
+
   /* System Actions */
 
   const shutdownDevice = () => {
@@ -516,7 +609,6 @@ const AdminDashboardTab = () => {
   };
 
   const handleDeleteAlertUser = async (alertUser) => {
-    console.log(alertUser);
     await deleteAlertUser(alertUser).then(() => {
       setIsAlertUserRemoved(true);
     });
@@ -545,21 +637,21 @@ const AdminDashboardTab = () => {
 
   /* Toggle Button Click Events for Viewing Graph */
   const handleTempGraphButtonClick = () => {
-    setShowTempGraph(!showTempGraph)
-  }
-  
+    setShowTempGraph(!showTempGraph);
+  };
+
   const handleHumidityGraphButtonClick = () => {
-    setShowHumidGraph(!showHumidGraph)
-  }
-  
+    setShowHumidGraph(!showHumidGraph);
+  };
+
   const handleSmokeGraphButtonClick = () => {
-    setShowSmokeGraph(!showSmokeGraph)
-  }
+    setShowSmokeGraph(!showSmokeGraph);
+  };
 
   return (
     <>
       <audio ref={audio1Ref} src="/assets/sounds/alarm-2.mp3" loop />
-      <audio ref={audio2Ref} src="/assets/sounds/alarm-2.mp3" loop />
+      {/* <audio ref={audio2Ref} src="/assets/sounds/alarm-2.mp3" loop /> */}
       <audio ref={audio3Ref} src="/assets/sounds/alarm-1.wav" loop />
       <Grid container spacing={1}>
         <Grid item xs={12}>
@@ -1016,7 +1108,7 @@ const AdminDashboardTab = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    mt: 5
+                    mt: 5,
                   }}
                 >
                   <LoadingButton
@@ -1088,7 +1180,7 @@ const AdminDashboardTab = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    mt: 5
+                    mt: 5,
                   }}
                 >
                   <LoadingButton
@@ -1178,7 +1270,7 @@ const AdminDashboardTab = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    mt: 5
+                    mt: 5,
                   }}
                 >
                   <LoadingButton
@@ -1504,6 +1596,57 @@ const AdminDashboardTab = () => {
         key={vertical + horizontal}
         autoHideDuration={4000}
       />
+
+      <Dialog
+        open={systemStatus === "offline" ? true : false}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleCloseSystemStatusDialog}
+        disableEscapeKeyDown
+        color="error"
+        sx={{
+          border: "2px solid white", 
+          backgroundColor: "rgba(0,0,0,0.85)"
+        }}
+        maxWidth="sm"
+        fullWidth
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle 
+          className="dialog-bg"
+          sx={{
+            textAlign: 'center',
+            color: 'white',
+            fontWeight: 700,
+            letterSpacing: '2px'
+          }}
+        >
+          {"SYSTEM STATUS"}
+        </DialogTitle>
+        <DialogContent 
+          className="dialog-bg" 
+          sx={{
+            textAlign: 'center',
+            color: 'white',
+          }}
+        >
+          <DialogContentText 
+            id="alert-dialog-slide-description"
+            sx={{
+              textAlign: 'center',
+              color: 'white',
+              fontWeight: 700,
+              letterSpacing: '2px'
+            }}
+          >
+            SYSTEM IS OFFLINE
+          </DialogContentText>
+        </DialogContent>
+        {/* <DialogActions>
+          <Button onClick={handleClose}>Disagree</Button>
+          <Button onClick={handleClose}>Agree</Button>
+        </DialogActions> */}
+      </Dialog>
     </>
   );
 };

@@ -358,10 +358,11 @@ export const deleteAlertUser = async (alertUser) => {
 
       const userRef = child(dbRef, userKey);
       await remove(userRef);
-
       console.log("User removed successfully");
+      return true;
     } else {
       console.log("User not found");
+      return false
     }
   } catch (error) {
     console.error("Error fetching Alert users:", error);

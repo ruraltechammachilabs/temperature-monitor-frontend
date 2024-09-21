@@ -69,10 +69,10 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			await getAllAlertUsers()
-			.then((alertusers => {
+			const  alertusers = await getAllAlertUsers()
+			if(alertusers.length > 0 && alertusers !== undefined) {
 				setAlertUsers(alertusers)
-			}))
+			}
 		};
 
 		fetchData();
@@ -81,16 +81,18 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 	/* Fetch new Alert Users Data When Alert User */
 	useEffect(() => {
 
-		const fetchData = async () => {
-			await getAllAlertUsers()
-			.then((alertusers => {
-				setAlertUsers(alertusers)
-			}))
-		};
-
 		if(isNewAlertUserAdded || isAlertUserRemoved) {
+			console.log("users changed !")
+			const fetchData = async () => {
+				await getAllAlertUsers()
+				.then((alertusers => {
+					setAlertUsers(alertusers)
+				}))
+			};
+	
 			fetchData();
 		}
+		
 	}, [isNewAlertUserAdded, isAlertUserRemoved])
 
 	const handleAddUserClick = (user) => {
@@ -98,10 +100,10 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 	};
 
 	const handleDeleteAlertUser = async (alertUser) => {
-		await deleteAlertUser(alertUser)
-		.then(() => {
+		const deleteuser = await deleteAlertUser(alertUser)
+		if(deleteuser) {
 			setIsAlertUserRemoved(true)
-		}) 
+		}
 
 		setIsAlertUserRemoved(false)
 	}
@@ -169,7 +171,6 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 					</Card>
 				</Grid>
 				{alertUsers &&
-					alertUsers.length > 0 &&
 					alertUsers.map((user, index) => {
 						return (
 							<Grid item xs={12} md={3} key={index}>
