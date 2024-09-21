@@ -68,7 +68,7 @@ export default function Header({ onOpenNav }) {
           sx={{ flexGrow: 1 }}
           color={textDarkColor}
         >
-          Data Center Monitoring
+          Data Center Monitoring System
         </Typography>
       </Box>
 

@@ -181,10 +181,6 @@ const AdminDashboardTab = () => {
 
   const [openSystemStatusDialog, setOpenSystemStatusDialog] = useState(false);
 
-  // const handleClickOpenSystemStatusDialog = () => {
-  //   setOpenSystemStatusDialog(true);
-  // };
-
   const handleCloseSystemStatusDialog = () => {
     setOpenSystemStatusDialog(false);
   };
@@ -1639,13 +1635,9 @@ const AdminDashboardTab = () => {
               letterSpacing: '2px'
             }}
           >
-            SYSTEM IS OFFLINE
+            OFFLINE
           </DialogContentText>
         </DialogContent>
-        {/* <DialogActions>
-          <Button onClick={handleClose}>Disagree</Button>
-          <Button onClick={handleClose}>Agree</Button>
-        </DialogActions> */}
       </Dialog>
     </>
   );

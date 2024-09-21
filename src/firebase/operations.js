@@ -105,7 +105,7 @@ export const convertToTimestamp = (dateTimeString) => {
 };
 
 export const convertDateStringToMilliseconds = async (dateString) => {
-  // const dateString = "20/09/2024 14:14:28";
+  // example : "20/09/2024 14:14:28"
   if(dateString !== "" && dateString !== undefined) {
     // Split the date and time parts
     const [datePart, timePart] = dateString.split(" ");
@@ -124,7 +124,7 @@ export const convertDateStringToMilliseconds = async (dateString) => {
   
     return milliseconds;
   } else return Date.now() 
-};
+}
 
 export const getChartData = async (sensorType, callback) => {
   const dbRef = ref(fbDB, "monitor");

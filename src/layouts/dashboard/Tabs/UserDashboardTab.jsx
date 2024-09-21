@@ -13,6 +13,11 @@ import {
   Alert,
   AlertTitle,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  Slide
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 
@@ -56,6 +61,10 @@ import {
   setRealtimeValues,
   getChartDataByDateTime,
 } from "../../../firebase/operations";
+
+const Transition = forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const UserDashboardTab = () => {
   const mdUp = useResponsive("up", "md");
@@ -103,7 +112,7 @@ const UserDashboardTab = () => {
 
   /* Audio */
   const audio1Ref = useRef(null);
-  const audio2Ref = useRef(null);
+  // const audio2Ref = useRef(null);
   const audio3Ref = useRef(null);
   const [isMuted, setIsMuted] = useState(false);
 
@@ -497,6 +506,14 @@ const UserDashboardTab = () => {
   const handleSmokeGraphButtonClick = () => {
     setShowSmokeGraph(!showSmokeGraph)
   }
+
+  /* System On Off Dialog */
+
+  const [openSystemStatusDialog, setOpenSystemStatusDialog] = useState(false);
+
+  const handleCloseSystemStatusDialog = () => {
+    setOpenSystemStatusDialog(false);
+  };
 
   return (
     <>
@@ -1004,6 +1021,53 @@ const UserDashboardTab = () => {
           autoHideDuration={4000}
         />
       </Grid>
+
+      <Dialog
+        open={systemStatus === "offline" ? true : false}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleCloseSystemStatusDialog}
+        disableEscapeKeyDown
+        color="error"
+        sx={{
+          border: "2px solid white", 
+          backgroundColor: "rgba(0,0,0,0.85)"
+        }}
+        maxWidth="sm"
+        fullWidth
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle 
+          className="dialog-bg"
+          sx={{
+            textAlign: 'center',
+            color: 'white',
+            fontWeight: 700,
+            letterSpacing: '2px'
+          }}
+        >
+          {"SYSTEM STATUS"}
+        </DialogTitle>
+        <DialogContent 
+          className="dialog-bg" 
+          sx={{
+            textAlign: 'center',
+            color: 'white',
+          }}
+        >
+          <DialogContentText 
+            id="alert-dialog-slide-description"
+            sx={{
+              textAlign: 'center',
+              color: 'white',
+              fontWeight: 700,
+              letterSpacing: '2px'
+            }}
+          >
+            OFFLINE
+          </DialogContentText>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
