@@ -103,9 +103,12 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 		const deleteuser = await deleteAlertUser(alertUser)
 		if(deleteuser) {
 			setIsAlertUserRemoved(true)
+
+			setTimeout(() => {
+				setIsAlertUserRemoved(false)
+			}, 1000);
 		}
 
-		setIsAlertUserRemoved(false)
 	}
 
 	return (

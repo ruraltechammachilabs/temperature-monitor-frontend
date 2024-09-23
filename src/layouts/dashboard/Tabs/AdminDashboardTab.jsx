@@ -662,7 +662,7 @@ const AdminDashboardTab = () => {
             className="alert-box"
           >
             <AlertTitle style={{ textAlign: "center" }}>WARNING</AlertTitle>
-            CRITICAL ALERT - TEMPERATURE HIGH
+            CRITICAL ALERT - TEMPERATURE EXCEEDED { data.Temperature } 
           </Alert>
           {/* <Alert
             severity="error"
@@ -675,7 +675,7 @@ const AdminDashboardTab = () => {
             className="alert-box"
           >
             <AlertTitle style={{ textAlign: "center" }}>WARNING</AlertTitle>
-            CRITICAL ALERT - HUMIDITY HIGH
+            CRITICAL ALERT - HUMIDITY EXCEEDED { data.Humidity } 
           </Alert> */}
           <Alert
             severity="error"
@@ -688,7 +688,7 @@ const AdminDashboardTab = () => {
             className="alert-box"
           >
             <AlertTitle style={{ textAlign: "center" }}>WARNING</AlertTitle>
-            CRITICAL ALERT - SMOKE HIGH
+            CRITICAL ALERT - SMOKE EXCEEDED { data.Smoke } 
           </Alert>
         </Grid>
       </Grid>

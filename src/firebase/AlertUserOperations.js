@@ -103,41 +103,23 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
   /* Set Counts */
   if (regularDocSnap.exists()) {
     const regular = regularDocSnap.data();
-
-    // const regularLen = Object.keys(regular).length
-    
     // Get the last key-value pair
     const keys = Object.keys(regular); // Get all keys in an array
     const lastKey = keys[keys.length - 1]; // Access the last key
-    const lastValue = regular[lastKey]; // Get the value associated with the last key
-
-    console.log("Regular Last Key:", lastKey);
-    console.log("Regular Last Value:", lastValue);
-
     const lastPersonValue = Number(lastKey.split("_")[1])
-
     regularCount = lastPersonValue
-
-    /* get the length of current regular sms list */
-    // regularCount = Object.keys(regular).length;
+    // const lastValue = regular[lastKey]; // Get the value associated with the last key
   } else {
     console.log("No such document named regular_sms !");
   }
 
   if (stageDocSnap.exists()) {
     const stage = stageDocSnap.data();
-    // stageCount = Object.keys(stage).length;
 
     // Get the last key-value pair
     const keys = Object.keys(stage); // Get all keys in an array
     const lastKey = keys[keys.length - 1]; // Access the last key
-    const lastValue = stage[lastKey]; // Get the value associated with the last key
-
-    console.log("Stage Last Key:", lastKey);
-    console.log("Stage Last Value:", lastValue);
-
     const lastPersonValue = Number(lastKey.split("_")[1])
-
     stageCount = lastPersonValue
   } else {
     console.log("No such document named stage_sms !");
@@ -145,143 +127,162 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
 
   if (powerDocSnap.exists()) {
     const power = powerDocSnap.data();
-    powerCount = Object.keys(power).length;
+    
+    // Get the last key-value pair
+    const keys = Object.keys(power); // Get all keys in an array
+    const lastKey = keys[keys.length - 1]; // Access the last key
+    const lastPersonValue = Number(lastKey.split("_")[1])
+    powerCount = lastPersonValue
   } else {
     console.log("No such document named power_sms !");
   }
 
   if (callDocSnap.exists()) {
     const calls = callDocSnap.data();
-    callCount = Object.keys(calls).length;
+    // Get the last key-value pair
+    const keys = Object.keys(calls); // Get all keys in an array
+    const lastKey = keys[keys.length - 1]; // Access the last key
+    const lastPersonValue = Number(lastKey.split("_")[1])
+    callCount = lastPersonValue
   } else {
     console.log("No such document named call !");
   }
 
   if (triggerDocSnap.exists()) {
     const trigger = triggerDocSnap.data();
-    triggerCount = Object.keys(trigger).length;
+    // Get the last key-value pair
+    const keys = Object.keys(trigger); // Get all keys in an array
+    const lastKey = keys[keys.length - 1]; // Access the last key
+    const lastPersonValue = Number(lastKey.split("_")[1])
+    triggerCount = lastPersonValue
   } else {
     console.log("No such document named call !");
   }
 
-
-
   /* Add Number */
-  // newAlertUser.updates.map((type) => {
-  //   switch (type) {
-  //     case 0: {
-  //       let regularName = "person_" + (regularCount + 1);
-  //       counts["regularCount"] = regularCount + 1;
-  //       counts;
-  //       updateDoc(
-  //         regularDocRef,
-  //         {
-  //           // [newAlertUser.name]: newAlertUser.phone,
-  //           [regularName]: newAlertUser.phone,
-  //         },
-  //         {
-  //           merge: true,
-  //         }
-  //       )
-  //         .then(() => {
-  //           console.log("Regular SMS Document updated successfully");
-  //         })
-  //         .catch((error) => {
-  //           console.error("Error updating document: ", error);
-  //         });
-  //       break;
-  //     }
+  newAlertUser.updates.map((type) => {
+    switch (type) {
+      case 0: {
+        let regularName = "person_" + (regularCount + 1);
+        counts["regularCount"] = regularCount + 1;
+        counts;
+        updateDoc(
+          regularDocRef,
+          {
+            // [newAlertUser.name]: newAlertUser.phone,
+            [regularName]: newAlertUser.phone,
+          },
+          {
+            merge: true,
+          }
+        )
+          .then(() => {
+            console.log("Regular SMS Document updated successfully");
+          })
+          .catch((error) => {
+            console.error("Error updating document: ", error);
+          });
+        break;
+      }
 
-  //     case 1: {
-  //       let stageName = "person_" + (stageCount + 1);
-  //       counts["stageCount"] = stageCount + 1;
-  //       updateDoc(
-  //         stageDocRef,
-  //         {
-  //           // [newAlertUser.name]: newAlertUser.phone,
-  //           [stageName]: newAlertUser.phone,
-  //         },
-  //         {
-  //           merge: true,
-  //         }
-  //       )
-  //         .then(() => {
-  //           console.log("Stage SMS Document updated successfully");
-  //         })
-  //         .catch((error) => {
-  //           console.error("Error updating document: ", error);
-  //         });
-  //       break;
-  //     }
+      case 1: {
+        let stageName = "person_" + (stageCount + 1);
+        counts["stageCount"] = stageCount + 1;
+        updateDoc(
+          stageDocRef,
+          {
+            // [newAlertUser.name]: newAlertUser.phone,
+            [stageName]: newAlertUser.phone,
+          },
+          {
+            merge: true,
+          }
+        )
+          .then(() => {
+            console.log("Stage SMS Document updated successfully");
+          })
+          .catch((error) => {
+            console.error("Error updating document: ", error);
+          });
+        break;
+      }
 
-  //     case 2: {
-  //       let powerName = "person_" + (powerCount + 1);
-  //       counts["powerCount"] = powerCount + 1;
-  //       updateDoc(
-  //         powerDocRef,
-  //         {
-  //           // [newAlertUser.name]: newAlertUser.phone,
-  //           [powerName]: newAlertUser.phone,
-  //         },
-  //         {
-  //           merge: true,
-  //         }
-  //       )
-  //         .then(() => {
-  //           console.log("Power up SMS Document updated successfully");
-  //         })
-  //         .catch((error) => {
-  //           console.error("Error updating document: ", error);
-  //         });
-  //       break;
-  //     }
+      case 2: {
+        let powerName = "person_" + (powerCount + 1);
+        counts["powerCount"] = powerCount + 1;
+        updateDoc(
+          powerDocRef,
+          {
+            // [newAlertUser.name]: newAlertUser.phone,
+            [powerName]: newAlertUser.phone,
+          },
+          {
+            merge: true,
+          }
+        )
+          .then(() => {
+            console.log("Power up SMS Document updated successfully");
+          })
+          .catch((error) => {
+            console.error("Error updating document: ", error);
+          });
+        break;
+      }
 
-  //     case 3: {
-  //       let callName = "person_" + (callCount + 1);
-  //       counts["callCount"] = callCount + 1;
-  //       updateDoc(
-  //         callDocRef,
-  //         {
-  //           // [newAlertUser.name]: newAlertUser.phone,
-  //           [callName]: newAlertUser.phone,
-  //         },
-  //         {
-  //           merge: true,
-  //         }
-  //       )
-  //         .then(() => {
-  //           console.log("Call Document updated successfully");
-  //         })
-  //         .catch((error) => {
-  //           console.error("Error updating document: ", error);
-  //         });
-  //       break;
-  //     }
-  //     case 4: {
-  //       let triggerName = "person_" + (triggerCount + 1);
-  //       counts["triggerCount"] = triggerCount + 1;
-  //       updateDoc(
-  //         triggerDocRef,
-  //         {
-  //           // [newAlertUser.name]: newAlertUser.phone,
-  //           [triggerName]: newAlertUser.phone,
-  //         },
-  //         {
-  //           merge: true,
-  //         }
-  //       )
-  //         .then(() => {
-  //           console.log("Trigger SMS Document updated successfully");
-  //         })
-  //         .catch((error) => {
-  //           console.error("Error updating document: ", error);
-  //         });
-  //       break;
-  //     }
-  //     default:
-  //       console.log("Not a valid number. Please provide a valid number.");
-  //   }
-  // });
+      case 3: {
+        let callName = "person_" + (callCount + 1);
+        counts["callCount"] = callCount + 1;
+        updateDoc(
+          callDocRef,
+          {
+            // [newAlertUser.name]: newAlertUser.phone,
+            [callName]: newAlertUser.phone,
+          },
+          {
+            merge: true,
+          }
+        )
+          .then(() => {
+            console.log("Call Document updated successfully");
+          })
+          .catch((error) => {
+            console.error("Error updating document: ", error);
+          });
+        break;
+      }
+      case 4: {
+        let triggerName = "person_" + (triggerCount + 1);
+        counts["triggerCount"] = triggerCount + 1;
+        updateDoc(
+          triggerDocRef,
+          {
+            // [newAlertUser.name]: newAlertUser.phone,
+            [triggerName]: newAlertUser.phone,
+          },
+          {
+            merge: true,
+          }
+        )
+          .then(() => {
+            console.log("Trigger SMS Document updated successfully");
+          })
+          .catch((error) => {
+            console.error("Error updating document: ", error);
+          });
+        break;
+      }
+      default:
+        console.log("Not a valid number. Please provide a valid number.");
+    }
+  });
+
+  // counts = {
+  //   regularCount,
+  //   stageCount,
+  //   powerCount,
+  //   callCount,
+  //   triggerCount
+  // }
 
   return counts;
 };

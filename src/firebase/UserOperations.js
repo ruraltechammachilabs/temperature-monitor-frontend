@@ -205,3 +205,7 @@ export const updateCurrentUserProfile = async (
 		return false; // Indicate failure
 	}
 }
+
+export const deleteUser = () => {
+	
+}

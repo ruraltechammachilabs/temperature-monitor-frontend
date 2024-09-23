@@ -13,8 +13,8 @@ import {
 	CardHeader,
 	IconButton,
 	Modal,
-	Fab,
-	CardActions,
+	// Fab,
+	// CardActions,
 	// Box,
 	// List,
 	// ListItem,
@@ -28,23 +28,25 @@ import { useResponsive } from "../../hooks/use-responsive";
 
 /* MUI Icons */
 import AddIcon from "@mui/icons-material/Add";
-import EditRoundedIcon from "@mui/icons-material/EditRounded";
-import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import CloseIcon from "@mui/icons-material/Close";
+// import EditRoundedIcon from "@mui/icons-material/EditRounded";
+// import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 
 /* Styles */
 import "../../styles/dashboard.css";
 
 /* Components */
-import { GlobalDataContext } from "../../Providers/GlobalDataProvider";
-import { grey, secondary } from "../../theme/palette";
 import AddUser from "./AddUser";
-import { updateProfile } from "firebase/auth";
-import { listAllUsers } from "../../firebase/UserOperations";
 import UserView from "./User/UserView";
+import { grey } from "../../theme/palette";
+import { GlobalDataContext } from "../../Providers/GlobalDataProvider";
+import { listAllUsers } from "../../firebase/UserOperations";
+import { AuthContext } from "../../Providers/AuthDataProvider";
+// import { updateProfile } from "firebase/auth";
 
 const UsersView = () => {
 	const { users, setUsers } = useContext(GlobalDataContext);
+	const { isNewUser } = useContext(AuthContext)
 	// const [users, setUsers] = useState([
 	//   {
 	//     name: "Gokul Dev",
@@ -115,7 +117,7 @@ const UsersView = () => {
 		};
 
 		fetchData();
-	}, [isAdded]);
+	}, [isNewUser]);
 
 	/* UI */
 

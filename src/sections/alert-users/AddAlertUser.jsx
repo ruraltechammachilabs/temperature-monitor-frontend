@@ -90,12 +90,16 @@ const AddAlertUser = ({ closeModal }) => {
       addAlertUser(user, counts).then((isAdded) => {
 		if(isAdded) {
 			closeModal();
-			setIsNewAlertUserAdded(true);
+			setIsNewAlertUserAdded(true)
+
+      setTimeout(() => {
+				setIsNewAlertUserAdded(false)
+			}, 1000);
 		}
       });
     });
 
-    setIsNewAlertUserAdded(false);
+    // setIsNewAlertUserAdded(false);
   };
 
   return (
