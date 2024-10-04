@@ -28,6 +28,7 @@ import {
   DialogContentText,
   DialogTitle,
   Slide,
+  useMediaQuery
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 
@@ -47,7 +48,7 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 
 /* Hooks */
 import { useResponsive } from "../../../hooks/use-responsive";
-import { useNetworkStatus } from "../../../hooks/use-network-status";
+// import { useNetworkStatus } from "../../../hooks/use-network-status";
 // import { useSelector, useDispatch } from 'react-redux'
 
 /* Styles */
@@ -127,6 +128,54 @@ const AdminDashboardTab = () => {
   const [showTempGraph, setShowTempGraph] = useState(false);
   const [showHumidGraph, setShowHumidGraph] = useState(false);
   const [showSmokeGraph, setShowSmokeGraph] = useState(false);
+
+  /* UI */
+
+  // const [resolution, setResolution] = useState({
+  //   width: window.innerWidth,
+  //   height: window.innerHeight
+  // });
+
+  // useEffect(() => {
+  //   // Function to update the resolution state when the window is resized
+  //   const handleResize = () => {
+  //     setResolution({
+  //       width: window.innerWidth,
+  //       height: window.innerHeight
+  //     });
+  //   };
+
+  //   // Add an event listener to detect window resizing
+  //   window.addEventListener('resize', handleResize);
+
+  //   // Clean up the event listener when the component unmounts
+  //   return () => {
+  //     window.removeEventListener('resize', handleResize);
+  //   };
+  // }, []);
+
+  /* Define media queries for different breakpoints */
+  // const isXSmall = useMediaQuery('(max-width:600px)');
+  // const isSmall = useMediaQuery('(min-width:601px) and (max-width:960px)');
+  // const isMedium = useMediaQuery('(min-width:961px) and (max-width:1280px)');
+  // const isLarge = useMediaQuery('(min-width:1281px) and (max-width:1920px)');
+  // const isXLarge = useMediaQuery('(min-width:1921px)');
+
+  // const [resolution, setResolution] = useState("");
+
+  // useEffect(() => {
+  //   if (isXSmall) {
+  //     setResolution("Extra Small (≤600px)");
+  //   } else if (isSmall) {
+  //     setResolution("Small (601px - 960px)");
+  //   } else if (isMedium) {
+  //     setResolution("Medium (961px - 1280px)");
+  //   } else if (isLarge) {
+  //     setResolution("Large (1281px - 1920px)");
+  //   } else if (isXLarge) {
+  //     setResolution("Extra Large (≥1921px)");
+  //   }
+  // }, [isXSmall, isSmall, isMedium, isLarge, isXLarge]);
 
   /* monitor Redux state */
   // const storedTemperature = useSelector((state) => state.monitor.temperature)
@@ -679,7 +728,6 @@ const AdminDashboardTab = () => {
           </Alert> */}
           <Alert
             severity="error"
-            // sx={{ display: isTempPulsating ? "block" : "none" }}
             sx={{
               display: isSmokePulsating ? "flex" : "none",
               justifyContent: "center",

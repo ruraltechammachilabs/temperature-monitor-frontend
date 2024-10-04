@@ -53,26 +53,14 @@ const UsersView = () => {
 	//     role: "Admin",
 	//     email: "gokul.devb@ammachilabs.org",
 	//   },
-	//   {
-	//     name: "Nayana",
-	//     role: "User",
-	//     email: "nayana@gmail.com",
-	//   },
-	//   {
-	//     name: "Jason",
-	//     role: "User",
-	//     email: "jasonstatic@gmail.com",
-	//   },
-	//   {
-	//     name: "Jake Sully",
-	//     role: "User",
-	//     email: "jakesully@gmail.com",
-	//   },
 	// ]);
 
 	const mdDown = useResponsive("down", "md");
 	const lgUp = useResponsive("up", "lg");
 	// const mdUp = useResponsive("up", "md");
+
+	const mdUp = useResponsive("up", "md")
+	const xlDown = useResponsive("down", "xl")
 
 	/* Modal */
 	const style = {
@@ -85,7 +73,6 @@ const UsersView = () => {
 	};
 
 	const [open, setOpen] = useState(false);
-	const [isAdded, setIsAdded] = useState(false);
 
 	const handleOpen = () => {
 		setOpen(true);
@@ -163,7 +150,7 @@ const UsersView = () => {
 									justifyContent: "center",
 									fontWeight: 600,
 									height: "100%",
-									minHeight: "27dvh",
+									minHeight: (mdUp && xlDown) ? "29dvh" : "27dvh",
 								}}
 							>
 								<Stack>

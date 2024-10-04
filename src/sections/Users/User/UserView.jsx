@@ -134,6 +134,7 @@ const UserView = ({ user }) => {
                 // alignItems: 'center',
                 justifyContent: "center",
                 fontWeight: 500,
+                wordWrap: 'break-word', 
                 // color: grey[100],
                 color: toggleDark ? grey[100] : grey[800],
                 letterSpacing: 1,

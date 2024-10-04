@@ -37,6 +37,7 @@ import "../../styles/dashboard.css";
 import { GlobalDataContext } from "../../Providers/GlobalDataProvider";
 import { grey } from "../../theme/palette";
 import { getAllAlertUsers, deleteAlertUser } from "../../firebase/AlertUserOperations";
+import { useResponsive } from "../../hooks/use-responsive";
 
 const AlertUsersView = ({ addAlertUserEvent }) => {
 	const { isNewAlertUserAdded, setIsAlertUserRemoved, isAlertUserRemoved } = useContext(GlobalDataContext);
@@ -47,6 +48,9 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 		// 	updates: [0, 1, 2],
 		// },
 	]);
+
+	const mdUp = useResponsive("up", "md")
+	const xlDown = useResponsive("down", "xl")
 
 	const items = [
 		{
@@ -95,7 +99,7 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 		
 	}, [isNewAlertUserAdded, isAlertUserRemoved])
 
-	const handleAddUserClick = (user) => {
+	const handleAddUserClick = () => {
 		addAlertUserEvent();
 	};
 
@@ -137,7 +141,7 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 							onClick={handleAddUserClick}
 							sx={{
 								height: "100%",
-								minHeight: "37dvh",
+								minHeight: (mdUp && xlDown) ? "58dvh" : "37dvh",
 							}}
 						>
 							<CardContent

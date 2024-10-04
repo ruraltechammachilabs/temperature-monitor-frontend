@@ -104,8 +104,8 @@ const SmsLimitSettings = () => {
   }, []);
 
   useEffect(() => {
-    setSmsLimit(Number(smsRanges.sms_limit_test));
-    setDefaultSmsLimit(Number(smsRanges.sms_limit_test));
+    setSmsLimit(Number(smsRanges.sms_limit));
+    setDefaultSmsLimit(Number(smsRanges.sms_limit));
   }, [smsRanges]);
 
   const handleSmsLimitsSubmit = () => {
