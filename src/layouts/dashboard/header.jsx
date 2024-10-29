@@ -17,10 +17,14 @@ import Box from "@mui/material/Box";
 import { grey } from "../../theme/palette"
 import { HEADER } from "./config-layout"
 import { useResponsive } from "../../hooks/use-responsive"
+import { GlobalDataContext } from '../../Providers/GlobalDataProvider'
+
+import HelpPopover from "./common/help-popover";
+import AccountPopover from '../../layouts/dashboard/common/account-popover'
+
 import AmritaLogo from "/assets/images/logos/amrita-logo.png"
 import AmmachiLabsLogo from "/assets/images/logos/ammachilabs-logo.png"
-import { GlobalDataContext } from '../../Providers/GlobalDataProvider'
-import AccountPopover from '../../layouts/dashboard/common/account-popover'
+
 
 /* Styles */
 import { bgBlur } from "../../theme/css";
@@ -96,6 +100,10 @@ export default function Header({ onOpenNav }) {
           />
           {/* <img src={NabardLogo} alt="Amrita" className={HeaderStyles.imglogo} /> */}
       </Box>}
+
+      {/* Help */}
+      <HelpPopover />
+
       <Fab size="small" aria-label="dark mode" onClick={toggleDarkMode} sx={{ mr: 2 }}>
        { toggleDark ?  <LightModeIcon color="warning" /> : <NightsStayIcon /> } 
       </Fab>

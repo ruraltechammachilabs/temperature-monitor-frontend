@@ -155,7 +155,10 @@ const TelegramBotConfig = () => {
 
   return (
     <>
-      <Grid container spacing={1}>
+      <Grid
+        container
+        spacing={1}
+      >
         <Grid item xs={12}>
           <Grid container>
             <Grid item xs={12} md={6}>
@@ -178,6 +181,7 @@ const TelegramBotConfig = () => {
                 modules={[Navigation, Scrollbar, A11y]}
                 spaceBetween={30}
                 slidesPerView={1}
+                autoHeight={true}
                 onSwiper={(swiper) => {
                   setMySwiper(swiper);
                 }}
@@ -224,7 +228,7 @@ const TelegramBotConfig = () => {
                               component="span"
                               color="#e0e0e0"
                             >
-                              Step 1
+                              Step 1 : Create a Telegram Bot
                             </Typography>
                           </>
                         }
@@ -238,10 +242,23 @@ const TelegramBotConfig = () => {
                               // color="#A7A4D2"
                               color="#C8C6F0"
                             >
-                              using the Telegram Bot API or BotFather, follow
-                              their respective instructions to create a new bot.
-                              You'll need to provide a name and username for
-                              your bot.
+                              1. Open Telegram and search for BotFather. <br />
+                              2.Start a chat with BotFather and type /start.
+                              <br />
+                              3. To create a new bot, type /newbot.
+                              <br />
+                              4. Follow the instructions provided by BotFather
+                              to: - Choose a name for your bot (it can be any
+                              name).
+                              <br />- Choose a username for your bot (must end
+                              with &quot;bot&quot;, e.g., MyFirstBot). <br />
+                              5. After your bot is created, BotFather will
+                              provide you with a token. Copy this token, as you
+                              will need it later.
+                              <br />
+                              The token will look something like this:
+                              <br />
+                              123456789:ABCdefGHIjklmNO12345PQrstuvWxYZ
                             </Typography>
                           </>
                         }
@@ -273,7 +290,7 @@ const TelegramBotConfig = () => {
                               component="span"
                               color="#e0e0e0"
                             >
-                              Step 2
+                              Step 2 : Create a Telegram Group
                             </Typography>
                           </>
                         }
@@ -286,17 +303,33 @@ const TelegramBotConfig = () => {
                               // color="#e0e0e0"
                               color="#C8C6F0"
                             >
-                              using the Telegram Bot API or BotFather, follow
-                              their respective instructions to create a new bot.
-                              You'll need to provide a name and username for
-                              your bot.
+                              1. Open Telegram and tap on the New Message icon
+                              (usually a pencil icon).
+                              <br />
+                              2. Select New Group. <br />
+                              3. Add at least one contact (you can later remove
+                              this contact if needed). <br />
+                              4. Choose a name for your group and tap Create.
                             </Typography>
                           </>
                         }
                       />
                     </ListItem>
                     <Divider variant="inset" component="li" />
+                  </List>
+                </SwiperSlide>
 
+                {/* Slide 2 */}
+                <SwiperSlide>
+                  <List
+                    sx={{
+                      width: "100%",
+                      background: "transparent",
+                      color: "#fff",
+                      // bgcolor: "#4E4AA6",
+                    }}
+                    className="poppins-regular"
+                  >
                     <ListItem alignItems="center">
                       <ListItemAvatar>
                         <Avatar
@@ -321,7 +354,7 @@ const TelegramBotConfig = () => {
                               component="span"
                               color="#e0e0e0"
                             >
-                              Step 3
+                              Step 3 : Get the Group Chat ID
                             </Typography>
                           </>
                         }
@@ -334,28 +367,36 @@ const TelegramBotConfig = () => {
                               // color="#e0e0e0"
                               color="#C8C6F0"
                             >
-                              using the Telegram Bot API or BotFather, follow
-                              their respective instructions to create a new bot.
-                              You'll need to provide a name and username for
-                              your bot.
+                              1. Add your newly created bot to the group: - Open
+                              the group, tap the group name at the top. - Tap
+                              Add Member or Invite to Group. - Search for your
+                              bot by its username and add it to the group.{" "}
+                              <br />
+                              2. Send a message in the group to ensure there is
+                              some activity. <br />
+                              3. To get the chat ID of the group, you can use
+                              this method: - Open a browser and go to this URL:
+                              <br />
+                              <u>
+                                https://api.telegram.org/bot&lt;your_bot_token&gt;/getUpdates
+                              </u>
+                              <br />
+                              Replace &lt;your_bot_token&gt; with the token you
+                              got from BotFather.
+                              <br /> - You will see a response containing
+                              updates about the bot, including the message you
+                              just sent. Look for the &quot;chat&quot; section
+                              in the response. The &quot;id&quot; field inside
+                              &quot;chat&quot; is the chat ID of the group.
+                              <br /> - The chat ID will look something like
+                              this: -123456789.
                             </Typography>
                           </>
                         }
                       />
                     </ListItem>
                     <Divider variant="inset" component="li" />
-                  </List>
-                </SwiperSlide>
-                <SwiperSlide>
-                  <List
-                    sx={{
-                      width: "100%",
-                      background: "transparent",
-                      color: "#fff",
-                      // bgcolor: "#4E4AA6",
-                    }}
-                    className="poppins-regular"
-                  >
+
                     <ListItem alignItems="center">
                       <ListItemAvatar>
                         <Avatar
@@ -380,7 +421,7 @@ const TelegramBotConfig = () => {
                               component="span"
                               color="#e0e0e0"
                             >
-                              Step 4
+                              Step 4 : Add Bot to the Group
                             </Typography>
                           </>
                         }
@@ -393,10 +434,12 @@ const TelegramBotConfig = () => {
                               // color="#e0e0e0"
                               color="#C8C6F0"
                             >
-                              using the Telegram Bot API or BotFather, follow
-                              their respective instructions to create a new bot.
-                              You'll need to provide a name and username for
-                              your bot.
+                              1. Once you&#39;ve got the chat ID, your bot is
+                              already added to the group, so no further action
+                              is needed to add it again.
+                              <br /> 2. Now you can use the token ID and chat ID
+                              in your code or program to send messages to this
+                              group.
                             </Typography>
                           </>
                         }
@@ -406,15 +449,15 @@ const TelegramBotConfig = () => {
 
                     <ListItem alignItems="center">
                       <ListItemAvatar>
-                        <Avatar
-                          alt="5"
+                        {/* <Avatar
+                          alt=" "
                           src="/static/images/avatar/1.jpg"
                           sx={{
                             bgcolor: grey[800],
                             borderRadius: "5px",
                             color: "white",
                           }}
-                        />
+                        /> */}
                       </ListItemAvatar>
                       <ListItemText
                         className="list-item-text"
@@ -428,7 +471,7 @@ const TelegramBotConfig = () => {
                               component="span"
                               color="#e0e0e0"
                             >
-                              Step 5
+                              Additional Tips
                             </Typography>
                           </>
                         }
@@ -441,58 +484,17 @@ const TelegramBotConfig = () => {
                               // color="#e0e0e0"
                               color="#C8C6F0"
                             >
-                              using the Telegram Bot API or BotFather, follow
-                              their respective instructions to create a new bot.
-                              You'll need to provide a name and username for
-                              your bot.
-                            </Typography>
-                          </>
-                        }
-                      />
-                    </ListItem>
-                    <Divider variant="inset" component="li" />
-
-                    <ListItem alignItems="center">
-                      <ListItemAvatar>
-                        <Avatar
-                          alt="6"
-                          src="/static/images/avatar/1.jpg"
-                          sx={{
-                            bgcolor: grey[800],
-                            borderRadius: "5px",
-                            color: "white",
-                          }}
-                        />
-                      </ListItemAvatar>
-                      <ListItemText
-                        className="list-item-text"
-                        primary={
-                          <>
-                            <Typography
-                              sx={{
-                                fontWeight: 700,
-                                textTransform: "uppercase",
-                              }}
-                              component="span"
-                              color="#e0e0e0"
-                            >
-                              Step 6
-                            </Typography>
-                          </>
-                        }
-                        secondary={
-                          <>
-                            <Typography
-                              sx={{ display: "inline" }}
-                              component="span"
-                              variant="body2"
-                              // color="#e0e0e0"
-                              color="#C8C6F0"
-                            >
-                              using the Telegram Bot API or BotFather, follow
-                              their respective instructions to create a new bot.
-                              You'll need to provide a name and username for
-                              your bot.
+                              - Always keep your bot token secure and do not
+                              share it publicly.
+                              <br />- To send messages to the group
+                              programmatically, you can use this endpoint:{" "}
+                              <br />
+                              <u>
+                                https://api.telegram.org/bot&lt;your_bot_token&gt;/sendMessage?chat_id=&lt;chat_id&gt;&amp;text=&lt;your_message&gt;
+                              </u>
+                              <br /> Replace &lt;your_bot_token&gt;,
+                              &lt;chat_id&gt;, and &lt;your_message&gt; with
+                              appropriate values.
                             </Typography>
                           </>
                         }

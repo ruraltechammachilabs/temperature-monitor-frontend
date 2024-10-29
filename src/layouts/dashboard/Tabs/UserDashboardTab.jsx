@@ -57,8 +57,8 @@ import "../../../styles/dashboard.css";
 /* Components */
 import CurrentTime from "../../../components/current-time/CurrentTime";
 import {
-  convertToTimestamp,
-  setRealtimeValues,
+  // convertToTimestamp,
+  // setRealtimeValues,
   getChartDataByDateTime,
 } from "../../../firebase/operations";
 
@@ -68,7 +68,7 @@ const Transition = forwardRef(function Transition(props, ref) {
 
 const UserDashboardTab = () => {
   const mdUp = useResponsive("up", "md");
-  const mdDown = useResponsive("down", "md");
+  // const mdDown = useResponsive("down", "md");
 
   const [tempRanges, setTempRanges] = useState({});
   const [humidRanges, setHumidRanges] = useState({});
@@ -240,11 +240,11 @@ const UserDashboardTab = () => {
           }
 
           /* Add data to realtime DB */
-          const modifiedNewData = {
-            ...newData,
-            TimestampTime: convertToTimestamp(newData.Timestamp),
-          };
-          setRealtimeValues(modifiedNewData);
+          // const modifiedNewData = {
+          //   ...newData,
+          //   TimestampTime: convertToTimestamp(newData.Timestamp),
+          // };
+          // setRealtimeValues(modifiedNewData);
         });
       } else {
         /* Play Alert Sound if Temp > Limit  */
@@ -275,12 +275,11 @@ const UserDashboardTab = () => {
         }
 
         /* Add data to realtime DB */
-        const modifiedNewData = {
-          ...newData,
-          TimestampTime: convertToTimestamp(newData.Timestamp),
-        };
-        // console.log(modifiedNewData);
-        setRealtimeValues(modifiedNewData);
+        // const modifiedNewData = {
+        //   ...newData,
+        //   TimestampTime: convertToTimestamp(newData.Timestamp),
+        // };
+        // setRealtimeValues(modifiedNewData);
       }
     });
 
@@ -420,15 +419,21 @@ const UserDashboardTab = () => {
     return () => unsubscribe();
   }, []);
 
+  /* Mute Alerts if System Offline */
+  useEffect(() => {
+    if(systemStatus === 'offline') {
+      audio1Ref.current.muted = true;
+      audio3Ref.current.muted = true;
+    } else {
+      audio1Ref.current.muted = false;
+      audio3Ref.current.muted = false;
+    }
+  }, [systemStatus])
+
   /* Check System Status */
 
   useEffect(() => {
     if (data) {
-
-      // const date = new Date(data.Timestamp);
-
-      // Get the timestamp in milliseconds
-      // const timestampMilliseconds = date.getTime();
 
       // Run the 2-second interval check and stop it after 2 minutes
       startChecking();
@@ -460,7 +465,7 @@ const UserDashboardTab = () => {
       // console.log(
       //   "2-minute checking ended. No further checks until data is updated."
       // );
-    }, 120000);
+    }, 240000);
   };
 
   const performSystemCheck = async () => {
@@ -468,7 +473,7 @@ const UserDashboardTab = () => {
     const currentTimestamp = await convertDateStringToMilliseconds(data.Timestamp)
     const timestampDiff = Date.now() - currentTimestamp
 
-    if (data && (timestampDiff < 120000)) {
+    if (data && (timestampDiff < 240000)) {
       setSystemStatus("online");
     } else {
       setSystemStatus("offline");
@@ -962,7 +967,7 @@ const UserDashboardTab = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid
+        {/* <Grid
           item
           xs={12}
           sx={{
@@ -996,7 +1001,7 @@ const UserDashboardTab = () => {
               maxHeight: mdDown ? "15rem" : "40rem",
               marginRight: "-15px",
             }}
-          />
+          /> */}
           {/* <img
             src="/assets/illustrations/server-rack-1.png"
             alt="server rack"
@@ -1006,7 +1011,7 @@ const UserDashboardTab = () => {
               marginRight: "-15px",
             }}
           /> */}
-        </Grid>
+        {/* </Grid> */}
 
         <Snackbar
           anchorOrigin={{

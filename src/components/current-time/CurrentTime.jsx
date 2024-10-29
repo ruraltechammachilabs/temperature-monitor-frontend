@@ -28,7 +28,8 @@ const CurrentTime = () => {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'end'
+          justifyContent: 'end',
+          mr: 2
         }}
       >
         <Typography variant="h5" sx={{ textAlign: "right" }}>

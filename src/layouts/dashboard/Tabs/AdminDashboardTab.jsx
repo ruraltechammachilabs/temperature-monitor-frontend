@@ -28,7 +28,6 @@ import {
   DialogContentText,
   DialogTitle,
   Slide,
-  useMediaQuery
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 
@@ -83,11 +82,12 @@ import { getLimitedAlertUsers } from "../../../firebase/AlertUserOperations";
 import CurrentTime from "../../../components/current-time/CurrentTime";
 import { GlobalDataContext } from "../../../Providers/GlobalDataProvider";
 import {
-  convertToTimestamp,
-  setRealtimeValues,
+  // convertToTimestamp,
+  // setRealtimeValues,
   getChartDataByDateTime,
   convertDateStringToMilliseconds
 } from "../../../firebase/operations";
+import { useNavigate } from "react-router-dom";
 // import { setThreshold } from "../../../services/monitoringSlice";
 // import { GraphDataContext } from "../../../Providers/GraphDataProvider";
 
@@ -130,6 +130,8 @@ const AdminDashboardTab = () => {
   const [showSmokeGraph, setShowSmokeGraph] = useState(false);
 
   /* UI */
+
+  const navigate = useNavigate()
 
   // const [resolution, setResolution] = useState({
   //   width: window.innerWidth,
@@ -373,12 +375,12 @@ const AdminDashboardTab = () => {
           }
 
           /* Add data to realtime DB */
-          const modifiedNewData = {
-            ...newData,
-            TimestampTime: convertToTimestamp(newData.Timestamp),
-          };
+          // const modifiedNewData = {
+          //   ...newData,
+          //   TimestampTime: convertToTimestamp(newData.Timestamp),
+          // };
 
-          setRealtimeValues(modifiedNewData);
+          // setRealtimeValues(modifiedNewData);
         });
       } else {
         /* Play Alert Sound if Temp > Limit  */
@@ -412,12 +414,12 @@ const AdminDashboardTab = () => {
         }
 
         /* Add data to realtime DB */
-        const modifiedNewData = {
-          ...newData,
-          TimestampTime: convertToTimestamp(newData.Timestamp),
-        };
+        // const modifiedNewData = {
+        //   ...newData,
+        //   TimestampTime: convertToTimestamp(newData.Timestamp),
+        // };
 
-        setRealtimeValues(modifiedNewData);
+        // setRealtimeValues(modifiedNewData);
       }
     });
 
@@ -581,15 +583,14 @@ const AdminDashboardTab = () => {
     }
   }, [isNewAlertUserAdded, isAlertUserRemoved]);
 
-  /* Check System Status */
+  /* 
+    * Check System Status
+    * If Sensor Data has not been received in 4 minutes, then system goes to offline mode
+    * If data arrives, then the interval is reset back to to 0 
+  */
 
   useEffect(() => {
     if (data) {
-
-      // const date = new Date(data.Timestamp);
-
-      // Get the timestamp in milliseconds
-      // const timestampMilliseconds = date.getTime();
 
       // Run the 2-second interval check and stop it after 2 minutes
       startChecking();
@@ -619,23 +620,33 @@ const AdminDashboardTab = () => {
     timeoutRef.current = setTimeout(() => {
       clearInterval(intervalRef.current); // Clear the interval after 2 minutes
       // console.log(
-      //   "2-minute checking ended. No further checks until data is updated."
+      //   "4-minute checking ended. No further checks until data is updated."
       // );
-    }, 120000);
+    }, 240000);
   };
 
   const performSystemCheck = async () => {
-    // Perform your logic to check if the system is on or off
-    // Example: Set the status based on a condition in the data object
+    // Perform logic to check if the system is on or off
     const currentTimestamp = await convertDateStringToMilliseconds(data.Timestamp)
     const timestampDiff = Date.now() - currentTimestamp
 
-    if (data && (timestampDiff < 120000)) {
+    if (data && (timestampDiff < 240000)) {
       setSystemStatus("online");
     } else {
       setSystemStatus("offline");
     }
   };
+
+  /* Mute Alerts if System Offline */
+  useEffect(() => {
+    if(systemStatus === 'offline') {
+      audio1Ref.current.muted = true;
+      audio3Ref.current.muted = true;
+    } else {
+      audio1Ref.current.muted = false;
+      audio3Ref.current.muted = false;
+    }
+  }, [systemStatus])
 
   /* System Actions */
 
@@ -692,6 +703,10 @@ const AdminDashboardTab = () => {
   const handleSmokeGraphButtonClick = () => {
     setShowSmokeGraph(!showSmokeGraph);
   };
+
+  const navigateUsers = () => {
+    navigate('/dashboard/alert-users')
+  }
 
   return (
     <>
@@ -761,6 +776,7 @@ const AdminDashboardTab = () => {
               justifyContent: "end",
               width: "100%",
               mb: 2,
+              p: 2
             }}
           >
             <IconButton
@@ -861,8 +877,23 @@ const AdminDashboardTab = () => {
         <CurrentTime />
 
         {/* Limits */}
-        <Grid item xs={12} alignItems="center" justifyContent="center">
-          <Card sx={{ minWidth: 50 }} className="custom-card">
+        <Grid 
+          item 
+          xs={12} 
+          alignItems="center" 
+          justifyContent="center"
+        >
+          <Card 
+            sx={{ 
+              minWidth: 50, 
+              m: {
+                xs: 2,
+                sm: 2,
+                md: 2
+              } 
+            }} 
+            className="custom-card"
+          >
             <CardContent
               sx={{
                 display: "flex",
@@ -1082,7 +1113,14 @@ const AdminDashboardTab = () => {
         </Grid> */}
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card
-            sx={{ minWidth: 50 }}
+            sx={{ 
+              minWidth: 50,
+              m: {
+                xs: 2,
+                sm: 2,
+                md: 2
+              } 
+            }}
             className={`custom-card ${isTempPulsating ? "pulsating" : ""}`}
           >
             <CardContent
@@ -1180,7 +1218,14 @@ const AdminDashboardTab = () => {
         </Grid>
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card
-            sx={{ minWidth: 50 }}
+            sx={{ 
+              minWidth: 50,
+              m: {
+                xs: 2,
+                sm: 2,
+                md: 2
+              } 
+            }}
             // className={`custom-card ${isHumidityPulsating ? "pulsating" : ""}`}
             className="custom-card"
           >
@@ -1275,7 +1320,14 @@ const AdminDashboardTab = () => {
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           {/* <QuickBanner percent={0.45} name="Smoke" /> */}
           <Card
-            sx={{ minWidth: 50 }}
+            sx={{ 
+              minWidth: 50,
+              m: {
+                xs: 2,
+                sm: 2,
+                md: 2
+              } 
+            }}
             className={`custom-card ${isSmokePulsating ? "pulsating" : ""}`}
           >
             {/* <CardHeader
@@ -1374,6 +1426,11 @@ const AdminDashboardTab = () => {
               borderRadius: 5,
               backgroundColor: "#4E4AA6",
               color: "#fff",
+              m: {
+                xs: 2,
+                sm: 2,
+                md: 2
+              }
             }}
             className="custom-card"
           >
@@ -1397,6 +1454,11 @@ const AdminDashboardTab = () => {
               minWidth: 100,
               borderRadius: 5,
               p: 3,
+              m: {
+                xs: 2,
+                sm: 2,
+                md: 2
+              }
             }}
             className="custom-card"
           >
@@ -1416,6 +1478,7 @@ const AdminDashboardTab = () => {
                 </IconButton>
               }
               title="Users"
+              onClick={navigateUsers}
             />
             <CardContent
               sx={{
