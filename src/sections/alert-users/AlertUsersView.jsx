@@ -41,6 +41,7 @@ import { useResponsive } from "../../hooks/use-responsive";
 
 const AlertUsersView = ({ addAlertUserEvent }) => {
 	const { isNewAlertUserAdded, setIsAlertUserRemoved, isAlertUserRemoved } = useContext(GlobalDataContext);
+	const [cardHeight, setCardHeight] =  useState("34dvh")
 	const [alertUsers, setAlertUsers] = useState([
 		// {
 		// 	name: "Gokul Dev",
@@ -49,8 +50,14 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 		// },
 	]);
 
+
+	const xsUp = useResponsive("up", "xs")
 	const mdUp = useResponsive("up", "md")
+	const mdDown = useResponsive("down", "md")
+	const lgDown = useResponsive("down", "lg")
+	const lgUp = useResponsive("up", "lg")
 	const xlDown = useResponsive("down", "xl")
+	const xlUp = useResponsive("up", "xl")
 
 	const items = [
 		{
@@ -115,6 +122,22 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 
 	}
 
+	useEffect(() => {
+		if(lgUp && xlDown) {
+			setCardHeight("42dvh")
+		} 
+		else if(mdUp && lgDown) {
+			setCardHeight("44dvh")
+		} 
+		else if(xsUp && mdDown) {
+			setCardHeight("40dvh")
+		}
+		else if(xlUp) {
+			setCardHeight("15dvh")
+		}
+
+	}, [xsUp, mdDown, mdUp, lgUp, xlDown, xlUp, lgDown]) 
+
 	return (
 		<>
 			<Grid
@@ -124,16 +147,17 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 					p: 3,
 				}}
 			>
-				<Grid item xs={12} md={3}>
+				<Grid item xs={12} sm={6} md={4} lg={4} xl={2}>
 					<Card
 						sx={{
-							minHeight: "37dvh",
+							minHeight: "40dvh",
 							background: "transparent",
 							display: "flex",
 							alignItems: "center",
 							justifyContent: "center",
 							border: (theme) =>
 								`dashed 2px ${theme.palette.divider}`,
+							borderRadius: '15px'
 						}}
 						className="custom-card"
 					>
@@ -141,7 +165,8 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 							onClick={handleAddUserClick}
 							sx={{
 								height: "100%",
-								minHeight: (mdUp && xlDown) ? "58dvh" : "37dvh",
+								// minHeight: (mdUp && xlDown) ? "45dvh" : "37dvh",
+								minHeight: cardHeight
 							}}
 						>
 							<CardContent
@@ -151,6 +176,7 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 									alignItems: "center",
 									justifyContent: "center",
 									fontWeight: 600,
+									height: "100%"
 								}}
 							>
 								<Stack>
@@ -180,10 +206,10 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 				{alertUsers &&
 					alertUsers.map((user, index) => {
 						return (
-							<Grid item xs={12} md={3} key={index}>
+							<Grid item xs={12} sm={6} md={4} lg={4} xl={2} key={index}>
 								<Card
 									sx={{
-										minHeight: "25dvh",
+										// minHeight: "25dvh",
 										display: "flex",
 										flexDirection: "column",
 										alignItems: "center",
@@ -276,7 +302,7 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 												p: 1,
 												display: "flex",
 												justifyContent: "center",
-
+												
 												alignItems: "center",
 											}}
 										>
@@ -387,13 +413,3 @@ const AlertUsersView = ({ addAlertUserEvent }) => {
 };
 
 export default AlertUsersView;
-
-/* 
-  {
-      'Gokul Dev': '8848433125',
-      'Ajay Devgn': '8812534789',
-      'Sharmila Raj': '9964532157',
-      'Bhairavi': '9421133680',
-    }
-
-*/

@@ -206,8 +206,8 @@ export default function AccountPopover() {
             py: 1.5,
             fontWeight: 600,
             p: "1rem",
-			display: 'flex',
-			justifyContent: 'center'
+            display: "flex",
+            justifyContent: "center",
           }}
         >
           Logout

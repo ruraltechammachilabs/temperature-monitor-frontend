@@ -4,7 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
 /* MUI */
-import { Box, Grid, Typography, Tabs, Tab } from "@mui/material";
+import Tabs, { tabsClasses } from "@mui/material/Tabs";
+import { Box, Grid, Typography, Tab } from "@mui/material";
 
 /* Styles */
 import "../global.css";
@@ -58,7 +59,7 @@ const a11yProps = (index) => {
 
 const TemperatureDashboardUser = () => {
   const { dashboardName, setDashboardName } = useContext(GlobalDataContext);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, setDbUser } = useContext(AuthContext);
 
   /* Tabs Variables */
   const [tabValue, setTabValue] = useState(0);
@@ -85,8 +86,11 @@ const TemperatureDashboardUser = () => {
   useEffect(() => {
     const fetchData = async () => {
       const userdata = await getUserByUid(currentUser.email);
-      if (userdata.role === "admin") setIsUser(true)
-        else setIsUser(false)
+      if (userdata.role === "user") setIsUser(true)
+      else setIsUser(false)
+
+      setDbUser(userdata);
+      localStorage.setItem("dbuser", JSON.stringify(userdata));
     };
     fetchData();
   }, [currentUser]);
@@ -159,6 +163,9 @@ const TemperatureDashboardUser = () => {
                 value={tabValue}
                 onChange={handleTabChange}
                 aria-label="Dashboard Tabs"
+                variant="scrollable"
+                scrollButtons="auto"
+                allowScrollButtonsMobile
                 sx={{
                   "& .MuiTabs-indicator": {
                     backgroundColor: "white", // Change indicator color
@@ -171,6 +178,11 @@ const TemperatureDashboardUser = () => {
                       color: "white", // Ensure color stays white in dark mode
                     },
                     fontSize: mdDown ? "16px" : "20px",
+                  },
+                  [`& .${tabsClasses.scrollButtons}`]: {
+                    color: "white",
+                    fontColor: "white",
+                    "&.Mui-disabled": { opacity: 0.3 },
                   },
                 }}
               >

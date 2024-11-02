@@ -100,7 +100,6 @@ const HumidityRangeSettings = () => {
       try {
         const humidData = await getHumidRanges();
         setHumidRanges(humidData);
-        console.log(humidData)
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -120,7 +119,7 @@ const HumidityRangeSettings = () => {
   const handleHumidLimitsSubmit = () => {
     console.log(lowHumidity, normalHumidity);
     setHumidRange(lowHumidity, normalHumidity).then(() => {
-      console.log("Humidity Range updated successfully !");
+      // console.log("Humidity Range updated successfully !");
       setState((prev) => {
         return { ...prev, open: true };
       });

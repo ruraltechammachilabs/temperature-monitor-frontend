@@ -98,9 +98,14 @@ const AddAlertUser = ({ closeModal }) => {
 		}
       });
     });
-
-    // setIsNewAlertUserAdded(false);
   };
+
+  const onMobileNumberInput = (num) => {
+    console.log("num - ", num)
+    if (/^\d{0,10}$/.test(num)) {
+      setPhone(num);
+    }
+  }
 
   return (
     <>
@@ -121,8 +126,10 @@ const AddAlertUser = ({ closeModal }) => {
             name="mobileno"
             label="Phone Number"
             color="secondary"
+            placeholder="Mobile Number (exclude country Code)"
             value={phone}
-            onChange={(event) => setPhone(event.target.value)}
+            inputProps={{ maxLength: 10 }}
+            onChange={(event) => onMobileNumberInput(event.target.value)}
           />
 
           {/* User Options */}

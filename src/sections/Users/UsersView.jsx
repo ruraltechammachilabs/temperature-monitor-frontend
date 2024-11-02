@@ -47,6 +47,9 @@ import { AuthContext } from "../../Providers/AuthDataProvider";
 const UsersView = () => {
 	const { users, setUsers } = useContext(GlobalDataContext);
 	const { isNewUser } = useContext(AuthContext)
+
+	const [cardHeight, setCardHeight] =  useState("15dvh")
+
 	// const [users, setUsers] = useState([
 	//   {
 	//     name: "Gokul Dev",
@@ -116,6 +119,15 @@ const UsersView = () => {
 		handleModalClose();
 	};
 
+	useEffect(() => {
+		if(lgUp && xlDown) {
+			setCardHeight("20dvh")
+		} else {
+			setCardHeight("20dvh")
+		}
+
+	}, [mdUp, lgUp, xlDown]) 
+
 	return (
 		<>
 			<Grid
@@ -125,10 +137,10 @@ const UsersView = () => {
 					p: lgUp ? 10 : 2,
 				}}
 			>
-				<Grid item xs={12} md={3}>
+				<Grid item xs={12} sm={6} md={4} lg={4} xl={2}>
 					<Card
 						sx={{
-							minHeight: "27dvh",
+							minHeight: "20dvh",
 							background: "transparent",
 							display: "flex",
 							alignItems: "center",
@@ -150,7 +162,8 @@ const UsersView = () => {
 									justifyContent: "center",
 									fontWeight: 600,
 									height: "100%",
-									minHeight: (mdUp && xlDown) ? "29dvh" : "27dvh",
+									// minHeight: (mdUp && xlDown) ? "29dvh" : "28dvh",
+									minHeight: cardHeight
 								}}
 							>
 								<Stack>

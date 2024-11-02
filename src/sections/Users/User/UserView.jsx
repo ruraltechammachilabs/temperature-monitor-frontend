@@ -35,7 +35,7 @@ const UserView = ({ user }) => {
   // const mdUp = useResponsive("up", "md");
 
   return (
-    <Grid item xs={6} md={4} lg={3}>
+    <Grid item xs={12} sm={6} md={4} lg={4} xl={2}>
       <Card
         sx={{
           display: "flex",
@@ -59,97 +59,107 @@ const UserView = ({ user }) => {
           }}
         > */}
         {/* Picture */}
-        <Grid container spacing={1}>
-          <Grid
-            item
-            xs={12}
-            sx={{
-              mt: 3,
-              pt: 1,
-              pb: 2,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
-            <Avatar
+        <CardContent>
+          <Grid container spacing={1}>
+            <Grid
+              item
+              xs={12}
               sx={{
-                // bgcolor: secondary.light
-                // bgcolor: grey[400],
-                bgcolor: secondary.light,
-                width: 60,
-                height: 60,
-              }}
-              src={
-                user.role === "Admin"
-                  ? "/assets/icons/users/admin_icon.png"
-                  : "/assets/icons/users/user_icon.png"
-              }
-            />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            sx={{
-              // pt: 3,
-              // pb: 2,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
-            {/* User Name */}
-            <Typography
-              sx={{
+                mt: 3,
+                pt: 1,
+                pb: 2,
                 display: "flex",
                 justifyContent: "center",
-                fontWeight: 600,
-                // color: grey[100],
-                color: toggleDark ? grey[100] : grey[800],
-                letterSpacing: 2,
-                mt: 1,
+                alignItems: "center",
+                // width: "100%",
               }}
             >
-              {user.displayName}
-            </Typography>
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            sx={{
-              // pt: 3,
-              // pb: 2,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
-            {/* Email */}
-            <Typography
+              <Avatar
+                sx={{
+                  // bgcolor: secondary.light
+                  // bgcolor: grey[400],
+                  bgcolor: secondary.light,
+                  width: 60,
+                  height: 60,
+                }}
+                src={
+                  user.role === "admin"
+                    ? "/assets/icons/users/admin_icon.png"
+                    : "/assets/icons/users/user_icon.png"
+                }
+              />
+            </Grid>
+            <Grid
+              item
+              xs={12}
               sx={{
+                // pt: 3,
+                // pb: 2,
                 display: "flex",
-                // alignItems: 'center',
                 justifyContent: "center",
-                fontWeight: 500,
+                alignItems: "center",
+                // width: "100%",
+              }}
+            >
+              {/* User Name */}
+              <Typography
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  fontWeight: 600,
+                  // color: grey[100],
+                  color: toggleDark ? grey[100] : grey[800],
+                  letterSpacing: 2,
+                  mt: 1,
+                  wordWrap: 'break-word', 
+                  textWrap: 'wrap',
+                }}
+              >
+                {user.displayName}
+              </Typography>
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              sx={{
+                // pt: 3,
+                // pb: 2,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "80%",
                 wordWrap: 'break-word', 
-                // color: grey[100],
-                color: toggleDark ? grey[100] : grey[800],
-                letterSpacing: 1,
-                mt: 1,
-                fontSize: {
-                  xs: "0.8rem",
-                  sm: "0.8rem",
-                  md: "1rem",
-                },
+                textWrap: 'wrap',
               }}
             >
-              {user.email}
-            </Typography>
+              {/* Email */}
+              <p>{ user.email }</p>
+              {/* <Typography
+                sx={{
+                  display: "flex",
+                  // alignItems: 'center',
+                  justifyContent: "center",
+                  fontWeight: 500,
+                  wordWrap: 'break-word', 
+                  textWrap: 'wrap',
+                  // color: grey[100],
+                  color: toggleDark ? grey[100] : grey[800],
+                  letterSpacing: 1,
+                  mt: 1,
+                  fontSize: {
+                    xs: "0.8rem",
+                    sm: "0.8rem",
+                    md: "1rem",
+                  },
+                }}
+              >
+                {user.email}
+              </Typography> */}
+            </Grid>
           </Grid>
-        </Grid>
+
+        </CardContent>
+
 
         {/* User Name */}
         {/* <Typography
@@ -182,7 +192,7 @@ const UserView = ({ user }) => {
             {user.email}
           </Typography> */}
         {/* </Stack> */}
-        <CardContent>
+        {/* <CardContent>
           <Stack
             sx={{
               p: 1,
@@ -192,7 +202,7 @@ const UserView = ({ user }) => {
               alignItems: "center",
             }}
           ></Stack>
-        </CardContent>
+        </CardContent> */}
         <CardActions
           sx={{
             display: "flex",

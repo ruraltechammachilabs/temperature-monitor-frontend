@@ -161,7 +161,7 @@ const TelegramBotConfig = () => {
       >
         <Grid item xs={12}>
           <Grid container>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={12}>
               <Typography
                 variant="h6"
                 sx={{
@@ -182,6 +182,7 @@ const TelegramBotConfig = () => {
                 spaceBetween={30}
                 slidesPerView={1}
                 autoHeight={true}
+                allowTouchMove={false}
                 onSwiper={(swiper) => {
                   setMySwiper(swiper);
                 }}
@@ -235,7 +236,7 @@ const TelegramBotConfig = () => {
                         secondary={
                           <>
                             <Typography
-                              sx={{ display: "inline" }}
+                              sx={{ display: "inline", textWrap: 'wrap', wordWrap: 'break-word' }}
                               component="span"
                               variant="body2"
                               // color="#e0e0e0"
@@ -297,7 +298,7 @@ const TelegramBotConfig = () => {
                         secondary={
                           <>
                             <Typography
-                              sx={{ display: "inline" }}
+                              sx={{ display: "inline", textWrap: 'wrap', wordWrap: 'break-word' }}
                               component="span"
                               variant="body2"
                               // color="#e0e0e0"
@@ -361,7 +362,7 @@ const TelegramBotConfig = () => {
                         secondary={
                           <>
                             <Typography
-                              sx={{ display: "inline" }}
+                              sx={{ display: "inline", textWrap: 'wrap', wordWrap: 'break-word' }}
                               component="span"
                               variant="body2"
                               // color="#e0e0e0"
@@ -428,7 +429,7 @@ const TelegramBotConfig = () => {
                         secondary={
                           <>
                             <Typography
-                              sx={{ display: "inline" }}
+                              sx={{ display: "inline", textWrap: 'wrap', wordWrap: 'break-word' }}
                               component="span"
                               variant="body2"
                               // color="#e0e0e0"
@@ -478,7 +479,7 @@ const TelegramBotConfig = () => {
                         secondary={
                           <>
                             <Typography
-                              sx={{ display: "inline" }}
+                              sx={{ display: "inline", textWrap: 'wrap', wordWrap: 'break-word' }}
                               component="span"
                               variant="body2"
                               // color="#e0e0e0"
@@ -570,11 +571,12 @@ const TelegramBotConfig = () => {
             <Grid
               item
               xs={12}
-              md={6}
+              md={12}
+              lg={8}
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "space-between",
+                justifyContent: "center",
               }}
             >
               <Stack spacing={3} sx={{ mt: 5, p: 5, position: "relative" }}>

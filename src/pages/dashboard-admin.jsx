@@ -196,8 +196,8 @@ const TemperatureDashboardAdmin = () => {
                     fontSize: mdDown ? "16px" : "20px",
                   },
                   [`& .${tabsClasses.scrollButtons}`]: {
-					color: 'white',
-					fontColor: 'white',
+                    color: "white",
+                    fontColor: "white",
                     "&.Mui-disabled": { opacity: 0.3 },
                   },
                 }}

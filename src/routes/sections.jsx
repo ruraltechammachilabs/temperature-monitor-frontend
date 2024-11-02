@@ -4,6 +4,7 @@ import { Outlet, Navigate, useRoutes } from "react-router-dom";
 import DashboardLayout from "../layouts/dashboard";
 import AuthPage from "../layouts/Auth/AuthPage";
 import PrivateRoute from "./PrivateRoute";
+// import TemperatureDashboard from '../pages/temperature-dashboard'
 
 export const TemperatureDashboard = lazy(() => import("../pages/temperature-dashboard"));
 export const Page404 = lazy(() => import("../pages/page-not-found"));

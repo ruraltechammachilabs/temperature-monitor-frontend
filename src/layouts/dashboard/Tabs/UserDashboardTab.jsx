@@ -67,7 +67,8 @@ const Transition = forwardRef(function Transition(props, ref) {
 });
 
 const UserDashboardTab = () => {
-  const mdUp = useResponsive("up", "md");
+  const mdDown = useResponsive("down", "md");
+  const lgUp = useResponsive("up", "lg");
   // const mdDown = useResponsive("down", "md");
 
   const [tempRanges, setTempRanges] = useState({});
@@ -569,8 +570,8 @@ const UserDashboardTab = () => {
         container
         spacing={2}
         sx={{
-          pr: mdUp ? 15 : 0,
-          pl: mdUp ? 15 : 0,
+          pr: lgUp ? 15 : 0,
+          pl: lgUp ? 15 : 0,
           pt: 2,
           display: "flex",
           position: "relative",
@@ -621,7 +622,17 @@ const UserDashboardTab = () => {
 
         {/* Limits */}
         <Grid item xs={12} alignItems="center" justifyContent="center">
-          <Card sx={{ minWidth: 50 }} className="custom-card">
+          <Card 
+            sx={{ 
+              minWidth: 50,
+              m: {
+                xs: 2,
+                sm: 2,
+                md: 2
+              }
+            }} 
+            className="custom-card"
+          >
             <CardContent
               sx={{
                 display: "flex",
@@ -635,7 +646,7 @@ const UserDashboardTab = () => {
                   item
                   xs={12}
                   md={4}
-                  sx={{ p: 2, borderRight: "1px dashed #ccc" }}
+                  sx={{ p: 2, borderRight: mdDown ?  "" : "1px dashed #ccc", borderBottom: mdDown ? "1px dashed #ccc" : "" }}
                 >
                   <Grid container spacing={1}>
                     <Grid
@@ -691,7 +702,7 @@ const UserDashboardTab = () => {
                   item
                   xs={12}
                   md={4}
-                  sx={{ p: 2, borderRight: "1px dashed #ccc" }}
+                  sx={{ p: 2, borderRight: mdDown ?  "" : "1px dashed #ccc", borderBottom: mdDown ? "1px dashed #ccc" : ""  }}
                 >
                   <Grid container spacing={1}>
                     <Grid
@@ -765,7 +776,15 @@ const UserDashboardTab = () => {
 
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card
-            sx={{ minWidth: 50 }}
+            sx={{ 
+              minWidth: 50,
+              m: {
+                xs: 2,
+                sm: 2,
+                md: 2,
+                lg: 0
+              } 
+            }}
             className={`custom-card ${isTempPulsating ? "pulsating" : ""}`}
           >
             <CardContent
@@ -835,7 +854,15 @@ const UserDashboardTab = () => {
         </Grid>
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card
-            sx={{ minWidth: 50 }}
+            sx={{ 
+              minWidth: 50,
+              m: {
+                xs: 2,
+                sm: 2,
+                md: 2,
+                lg: 0
+              }
+            }}
             // className={`custom-card ${isHumidityPulsating ? "pulsating" : ""}`}
             className="custom-card"
           >
@@ -906,7 +933,15 @@ const UserDashboardTab = () => {
         </Grid>
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card
-            sx={{ minWidth: 50 }}
+            sx={{ 
+              minWidth: 50,
+              m: {
+                xs: 2,
+                sm: 2,
+                md: 2,
+                lg: 0
+              } 
+            }}
             className={`custom-card ${isSmokePulsating ? "pulsating" : ""}`}
           >
             {/* <CardHeader

@@ -77,6 +77,8 @@ export const addAlertUser = async (newAlertUser, counts) => {
 
 export const addAlertUserToFirestore = async (newAlertUser) => {
 
+  console.log(newAlertUser)
+
   const regularDocRef = doc(db, "data_read", "regular_sms");
   const stageDocRef = doc(db, "data_read", "stage_sms");
   const powerDocRef = doc(db, "data_read", "power_sms");
@@ -105,9 +107,11 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
     const regular = regularDocSnap.data();
     // Get the last key-value pair
     const keys = Object.keys(regular); // Get all keys in an array
-    const lastKey = keys[keys.length - 1]; // Access the last key
-    const lastPersonValue = Number(lastKey.split("_")[1])
-    regularCount = lastPersonValue
+    if(keys.length > 0) {
+      const lastKey = keys[keys.length - 1]; // Access the last key
+      const lastPersonValue = Number(lastKey.split("_")[1])
+      regularCount = lastPersonValue
+    }
     // const lastValue = regular[lastKey]; // Get the value associated with the last key
   } else {
     console.log("No such document named regular_sms !");
@@ -118,9 +122,11 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
 
     // Get the last key-value pair
     const keys = Object.keys(stage); // Get all keys in an array
-    const lastKey = keys[keys.length - 1]; // Access the last key
-    const lastPersonValue = Number(lastKey.split("_")[1])
-    stageCount = lastPersonValue
+    if(keys.length > 0) {
+      const lastKey = keys[keys.length - 1]; // Access the last key
+      const lastPersonValue = Number(lastKey.split("_")[1])
+      stageCount = lastPersonValue
+    }
   } else {
     console.log("No such document named stage_sms !");
   }
@@ -130,9 +136,11 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
     
     // Get the last key-value pair
     const keys = Object.keys(power); // Get all keys in an array
-    const lastKey = keys[keys.length - 1]; // Access the last key
-    const lastPersonValue = Number(lastKey.split("_")[1])
-    powerCount = lastPersonValue
+    if(keys.length > 0) {
+      const lastKey = keys[keys.length - 1]; // Access the last key
+      const lastPersonValue = Number(lastKey.split("_")[1])
+      powerCount = lastPersonValue
+    }
   } else {
     console.log("No such document named power_sms !");
   }
@@ -141,9 +149,11 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
     const calls = callDocSnap.data();
     // Get the last key-value pair
     const keys = Object.keys(calls); // Get all keys in an array
-    const lastKey = keys[keys.length - 1]; // Access the last key
-    const lastPersonValue = Number(lastKey.split("_")[1])
-    callCount = lastPersonValue
+    if(keys.length > 0) {
+      const lastKey = keys[keys.length - 1]; // Access the last key
+      const lastPersonValue = Number(lastKey.split("_")[1])
+      callCount = lastPersonValue
+    }
   } else {
     console.log("No such document named call !");
   }
@@ -152,9 +162,11 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
     const trigger = triggerDocSnap.data();
     // Get the last key-value pair
     const keys = Object.keys(trigger); // Get all keys in an array
-    const lastKey = keys[keys.length - 1]; // Access the last key
-    const lastPersonValue = Number(lastKey.split("_")[1])
-    triggerCount = lastPersonValue
+    if(keys.length > 0) {
+      const lastKey = keys[keys.length - 1]; // Access the last key
+      const lastPersonValue = Number(lastKey.split("_")[1])
+      triggerCount = lastPersonValue
+    }
   } else {
     console.log("No such document named call !");
   }
