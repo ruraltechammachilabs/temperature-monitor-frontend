@@ -67,7 +67,7 @@ export const addAlertUser = async (newAlertUser, counts) => {
       updates: newAlertUser.updates,
       ...counts,
     });
-    console.log("Alert user added successfully!");
+    // console.log("Alert user added successfully!");
     return true; // Indicate success
   } catch (error) {
     console.error("Error adding alert user:", error);
@@ -76,8 +76,6 @@ export const addAlertUser = async (newAlertUser, counts) => {
 };
 
 export const addAlertUserToFirestore = async (newAlertUser) => {
-
-  console.log(newAlertUser)
 
   const regularDocRef = doc(db, "data_read", "regular_sms");
   const stageDocRef = doc(db, "data_read", "stage_sms");
@@ -188,9 +186,9 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
             merge: true,
           }
         )
-          .then(() => {
-            console.log("Regular SMS Document updated successfully");
-          })
+          // .then(() => {
+          //   console.log("Regular SMS Document updated successfully");
+          // })
           .catch((error) => {
             console.error("Error updating document: ", error);
           });
@@ -210,9 +208,9 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
             merge: true,
           }
         )
-          .then(() => {
-            console.log("Stage SMS Document updated successfully");
-          })
+          // .then(() => {
+          //   console.log("Stage SMS Document updated successfully");
+          // })
           .catch((error) => {
             console.error("Error updating document: ", error);
           });
@@ -232,9 +230,9 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
             merge: true,
           }
         )
-          .then(() => {
-            console.log("Power up SMS Document updated successfully");
-          })
+          // .then(() => {
+          //   console.log("Power up SMS Document updated successfully");
+          // })
           .catch((error) => {
             console.error("Error updating document: ", error);
           });
@@ -254,9 +252,9 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
             merge: true,
           }
         )
-          .then(() => {
-            console.log("Call Document updated successfully");
-          })
+          // .then(() => {
+          //   console.log("Call Document updated successfully");
+          // })
           .catch((error) => {
             console.error("Error updating document: ", error);
           });
@@ -275,9 +273,9 @@ export const addAlertUserToFirestore = async (newAlertUser) => {
             merge: true,
           }
         )
-          .then(() => {
-            console.log("Trigger SMS Document updated successfully");
-          })
+          // .then(() => {
+          //   console.log("Trigger SMS Document updated successfully");
+          // })
           .catch((error) => {
             console.error("Error updating document: ", error);
           });
@@ -317,9 +315,9 @@ export const deleteAlertUser = async (alertUser) => {
           // [alertUser.name]: deleteField()
           [name]: deleteField(),
         })
-          .then(() => {
-            console.log("User Deleted from Regular SMS Document successfully");
-          })
+          // .then(() => {
+          //   console.log("User Deleted from Regular SMS Document successfully");
+          // })
           .catch((error) => {
             console.error("Error updating document: ", error);
           });
@@ -331,9 +329,9 @@ export const deleteAlertUser = async (alertUser) => {
           // [alertUser.name]: deleteField()
           [name]: deleteField(),
         })
-          .then(() => {
-            console.log("User Deleted from Stage SMS Document successfully");
-          })
+          // .then(() => {
+          //   console.log("User Deleted from Stage SMS Document successfully");
+          // })
           .catch((error) => {
             console.error("Error updating document: ", error);
           });
@@ -345,9 +343,9 @@ export const deleteAlertUser = async (alertUser) => {
           // [alertUser.name]: deleteField()
           [name]: deleteField(),
         })
-          .then(() => {
-            console.log("User Deleted from Power up SMS Document successfully");
-          })
+          // .then(() => {
+          //   console.log("User Deleted from Power up SMS Document successfully");
+          // })
           .catch((error) => {
             console.error("Error updating document: ", error);
           });
@@ -359,9 +357,9 @@ export const deleteAlertUser = async (alertUser) => {
           // [alertUser.name]: deleteField()
           [name]: deleteField(),
         })
-          .then(() => {
-            console.log("User Deleted from Call Document successfully");
-          })
+          // .then(() => {
+          //   console.log("User Deleted from Call Document successfully");
+          // })
           .catch((error) => {
             console.error("Error updating document: ", error);
           });
@@ -373,9 +371,9 @@ export const deleteAlertUser = async (alertUser) => {
           // [alertUser.name]: deleteField()
           [name]: deleteField(),
         })
-          .then(() => {
-            console.log("User Deleted from Trigger SMS Document successfully");
-          })
+          // .then(() => {
+          //   console.log("User Deleted from Trigger SMS Document successfully");
+          // })
           .catch((error) => {
             console.error("Error updating document: ", error);
           });
@@ -399,7 +397,7 @@ export const deleteAlertUser = async (alertUser) => {
 
       const userRef = child(dbRef, userKey);
       await remove(userRef);
-      console.log("User removed successfully");
+      // console.log("User removed successfully");
       return true;
     } else {
       console.log("User not found");

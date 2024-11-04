@@ -28,6 +28,9 @@ import {
   DialogContentText,
   DialogTitle,
   Slide,
+  DialogActions,
+  Button,
+  Fade
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 
@@ -131,6 +134,8 @@ const AdminDashboardTab = () => {
 
   /* UI */
 
+  const [currentAlertNumber, setCurrentAlertNumber] = useState(" ")
+  const [currentAlertUser, setCurrentAlertUser] = useState({})
   const navigate = useNavigate()
 
   // const [resolution, setResolution] = useState({
@@ -205,6 +210,31 @@ const AdminDashboardTab = () => {
     Smoke: 0,
   });
 
+  // Snackbar
+  const [deleteUserSnackbarState, setDeleteUserSnackbarState] = useState({
+    open: false,
+  });
+
+  /* Alert User Snackbar methods */
+  const handleDeleteUserSnackbarOpen = () => () => {
+    setDeleteUserSnackbarState({
+      open: true
+    });
+  };
+  
+  const handleDeleteUserSnackbarClose = () => () => {
+    setDeleteUserSnackbarState({
+      open: false,
+    });
+  };
+
+  // const handleSnackbarClose = () => {
+  //   setState({
+  //     ...state,
+  //     open: false,
+  //   });
+  // };
+
   /* Modal */
   const style = {
     position: "absolute",
@@ -226,6 +256,26 @@ const AdminDashboardTab = () => {
 
   const handleModalClose = () => {
     setOpen(false);
+  };
+
+  /* Delete Alert User Dialog */
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+  const handleOpenDeleteDialog = (user) => {
+    setOpenDeleteDialog(true);
+    setCurrentAlertNumber(user.phone)
+    setCurrentAlertUser(user)
+  };
+
+  const handleAgreeDeleteDialog = (user) => {
+    handleDeleteUserSnackbarOpen()
+    handleCloseDeleteDialog()
+    handleDeleteAlertUser(user)
+  }
+  
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
   };
 
   /* System On Off Dialog */
@@ -667,9 +717,13 @@ const AdminDashboardTab = () => {
   const handleDeleteAlertUser = async (alertUser) => {
     await deleteAlertUser(alertUser).then(() => {
       setIsAlertUserRemoved(true);
+
+      setTimeout(() => {
+        setIsAlertUserRemoved(false);
+      }, 500);
     });
 
-    setIsAlertUserRemoved(false);
+    
   };
 
   /* Audio Actions */
@@ -1504,7 +1558,7 @@ const AdminDashboardTab = () => {
                         <IconButton
                           edge="end"
                           aria-label="delete"
-                          onClick={() => handleDeleteAlertUser(user)}
+                          onClick={() => handleOpenDeleteDialog(user)}
                         >
                           <DeleteIcon />
                         </IconButton>
@@ -1704,6 +1758,18 @@ const AdminDashboardTab = () => {
         autoHideDuration={4000}
       />
 
+      <Snackbar
+        anchorOrigin={{
+          vertical: state.vertical,
+          horizontal: state.horizontal,
+        }}
+        open={deleteUserSnackbarState.open}
+        onClose={handleDeleteUserSnackbarClose}
+        message={"Alert number \"" + currentAlertNumber + "\" deleted successfully"}
+        key={vertical + horizontal + currentAlertNumber}
+        autoHideDuration={3000}
+      />
+
       <Dialog
         open={systemStatus === "offline" ? true : false}
         TransitionComponent={Transition}
@@ -1749,6 +1815,26 @@ const AdminDashboardTab = () => {
             OFFLINE
           </DialogContentText>
         </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={openDeleteDialog}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleCloseDeleteDialog}
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle>{"Delete Selected Number ?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            The mobile number "{ currentAlertNumber }" will no longer receive Alerts.
+            Are you sure you want to delete the user ?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog}>Disagree</Button>
+          <Button onClick={() => handleAgreeDeleteDialog(currentAlertUser)}>Agree</Button>
+        </DialogActions>
       </Dialog>
     </>
   );

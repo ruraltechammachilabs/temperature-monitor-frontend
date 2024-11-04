@@ -123,7 +123,7 @@ const UsersView = () => {
 		if(lgUp && xlDown) {
 			setCardHeight("20dvh")
 		} else {
-			setCardHeight("20dvh")
+			setCardHeight("29dvh")
 		}
 
 	}, [mdUp, lgUp, xlDown]) 
@@ -137,7 +137,7 @@ const UsersView = () => {
 					p: lgUp ? 10 : 2,
 				}}
 			>
-				<Grid item xs={12} sm={6} md={4} lg={4} xl={2}>
+				<Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
 					<Card
 						sx={{
 							minHeight: "20dvh",

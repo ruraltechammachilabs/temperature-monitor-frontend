@@ -101,7 +101,6 @@ const AddAlertUser = ({ closeModal }) => {
   };
 
   const onMobileNumberInput = (num) => {
-    console.log("num - ", num)
     if (/^\d{0,10}$/.test(num)) {
       setPhone(num);
     }

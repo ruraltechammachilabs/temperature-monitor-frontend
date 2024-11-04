@@ -35,7 +35,7 @@ const UserView = ({ user }) => {
   // const mdUp = useResponsive("up", "md");
 
   return (
-    <Grid item xs={12} sm={6} md={4} lg={4} xl={2}>
+    <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
       <Card
         sx={{
           display: "flex",
