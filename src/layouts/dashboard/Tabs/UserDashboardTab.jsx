@@ -17,14 +17,14 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  Slide
+  Slide,
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 /* MUI Icons */
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import BarChartIcon from '@mui/icons-material/BarChart';
+import BarChartIcon from "@mui/icons-material/BarChart";
 
 /* Components */
 import QuickBanner from "../../../sections/banner/QuickBanner";
@@ -39,7 +39,7 @@ import {
   listenForTempRangeChanges,
   listenForHumidRangeChanges,
   listenForSmokeRangeChanges,
-  convertDateStringToMilliseconds
+  // convertDateStringToMilliseconds,
 } from "../../../firebase/operations";
 import {
   getHumidRanges,
@@ -82,6 +82,8 @@ const UserDashboardTab = () => {
 
   /* Graphs */
   const [mainGraphData, setMainGraphData] = useState([]);
+  const [isGraphUpdated, setIsGraphUpdated] = useState(false);
+
   const [showTempGraph, setShowTempGraph] = useState(false);
   const [showHumidGraph, setShowHumidGraph] = useState(false);
   const [showSmokeGraph, setShowSmokeGraph] = useState(false);
@@ -239,13 +241,6 @@ const UserDashboardTab = () => {
             handlePause3();
             setIsSmokePulsating(false);
           }
-
-          /* Add data to realtime DB */
-          // const modifiedNewData = {
-          //   ...newData,
-          //   TimestampTime: convertToTimestamp(newData.Timestamp),
-          // };
-          // setRealtimeValues(modifiedNewData);
         });
       } else {
         /* Play Alert Sound if Temp > Limit  */
@@ -274,13 +269,6 @@ const UserDashboardTab = () => {
           handlePause3();
           setIsSmokePulsating(false);
         }
-
-        /* Add data to realtime DB */
-        // const modifiedNewData = {
-        //   ...newData,
-        //   TimestampTime: convertToTimestamp(newData.Timestamp),
-        // };
-        // setRealtimeValues(modifiedNewData);
       }
     });
 
@@ -332,8 +320,14 @@ const UserDashboardTab = () => {
       setMainGraphData(mainData);
     };
 
-    fetchLiveData();
-  }, []);
+    if (isGraphUpdated) {
+      fetchLiveData();
+
+      setTimeout(() => {
+        setIsGraphUpdated(false);
+      }, 200);
+    }
+  }, [isGraphUpdated]);
 
   /* Temperature Changes Alert */
   useEffect(() => {
@@ -422,22 +416,77 @@ const UserDashboardTab = () => {
 
   /* Mute Alerts if System Offline */
   useEffect(() => {
-    if(systemStatus === 'offline') {
+    if (systemStatus === "offline") {
       audio1Ref.current.muted = true;
       audio3Ref.current.muted = true;
     } else {
       audio1Ref.current.muted = false;
       audio3Ref.current.muted = false;
     }
-  }, [systemStatus])
+  }, [systemStatus]);
 
   /* Check System Status */
 
+  // useEffect(() => {
+  //   if (data) {
+
+  //     // Run the 2-second interval check and stop it after 2 minutes
+  //     startChecking();
+
+  //     // Cleanup both the interval and the timeout when `data` is updated or component unmounts
+  //     return () => {
+  //       clearInterval(intervalRef.current);
+  //       clearTimeout(timeoutRef.current);
+  //     };
+  //   }
+  // }, [data]);
+
+  // const startChecking = () => {
+  //   // Clear any previous intervals and timeouts
+  //   clearInterval(intervalRef.current);
+  //   clearTimeout(timeoutRef.current);
+
+  //   // Perform an immediate system check
+  //   performSystemCheck();
+
+  //   // Start the interval to check every 2 seconds
+  //   intervalRef.current = setInterval(() => {
+  //     performSystemCheck();
+  //   }, 2000);
+
+  //   // Stop the interval after 2 minutes
+  //   timeoutRef.current = setTimeout(() => {
+  //     clearInterval(intervalRef.current); // Clear the interval after 2 minutes
+  //     // console.log(
+  //     //   "2-minute checking ended. No further checks until data is updated."
+  //     // );
+  //   }, 240000);
+  // };
+
+  // const performSystemCheck = async () => {
+  //   // logic to check if the system is on or off
+  //   const currentTimestamp = await convertDateStringToMilliseconds(data.Timestamp)
+  //   const timestampDiff = Date.now() - currentTimestamp
+
+  //   if (data && (timestampDiff < 240000)) {
+  //     setSystemStatus("online");
+  //   } else {
+  //     setSystemStatus("offline");
+  //   }
+  // };
+
+  /*
+   * Check System Status
+   * If Sensor Data has not been received in 4 minutes, then system goes to offline mode
+   * If data arrives, then the interval is reset back to to 0
+   */
+
   useEffect(() => {
     if (data) {
-
-      // Run the 2-second interval check and stop it after 2 minutes
+      // Run the 2-second interval check and stop it after 4 minutes
       startChecking();
+
+      localStorage.setItem("prevTime", Date.now());
 
       // Cleanup both the interval and the timeout when `data` is updated or component unmounts
       return () => {
@@ -455,29 +504,46 @@ const UserDashboardTab = () => {
     // Perform an immediate system check
     performSystemCheck();
 
-    // Start the interval to check every 2 seconds
+    // Start the interval to check every 1 minute
     intervalRef.current = setInterval(() => {
       performSystemCheck();
-    }, 2000);
+    }, 60000);
 
-    // Stop the interval after 2 minutes
+    // Stop the interval after 4 minutes
     timeoutRef.current = setTimeout(() => {
       clearInterval(intervalRef.current); // Clear the interval after 2 minutes
       // console.log(
-      //   "2-minute checking ended. No further checks until data is updated."
+      //   "4-minute checking ended. No further checks until data is updated."
       // );
+
+      /* Find Time Difference & check system offline or online */
+      const now = Date.now();
+      const prev = Number(localStorage.getItem("prevTime"));
+
+      if (prev !== 0) {
+        const timestampDiff = now - prev;
+
+        if (data && timestampDiff < 240000) {
+          setSystemStatus("online");
+        } else {
+          setSystemStatus("offline");
+        }
+      }
     }, 240000);
   };
 
   const performSystemCheck = async () => {
-    // logic to check if the system is on or off
-    const currentTimestamp = await convertDateStringToMilliseconds(data.Timestamp)
-    const timestampDiff = Date.now() - currentTimestamp
+    // Perform logic to check if the system is on or off
+    const now = Date.now();
+    const prev = Number(localStorage.getItem("prevTime"));
+    if (prev !== 0) {
+      const timestampDiff = now - prev;
 
-    if (data && (timestampDiff < 240000)) {
-      setSystemStatus("online");
-    } else {
-      setSystemStatus("offline");
+      if (data && timestampDiff < 240000) {
+        setSystemStatus("online");
+      } else {
+        setSystemStatus("offline");
+      }
     }
   };
 
@@ -502,16 +568,19 @@ const UserDashboardTab = () => {
 
   /* Toggle Button Click Events for Viewing Graph */
   const handleTempGraphButtonClick = () => {
-    setShowTempGraph(!showTempGraph)
-  }
-  
+    setIsGraphUpdated(true);
+    setShowTempGraph(!showTempGraph);
+  };
+
   const handleHumidityGraphButtonClick = () => {
-    setShowHumidGraph(!showHumidGraph)
-  }
-  
+    setIsGraphUpdated(true);
+    setShowHumidGraph(!showHumidGraph);
+  };
+
   const handleSmokeGraphButtonClick = () => {
-    setShowSmokeGraph(!showSmokeGraph)
-  }
+    setIsGraphUpdated(true);
+    setShowSmokeGraph(!showSmokeGraph);
+  };
 
   /* System On Off Dialog */
 
@@ -570,8 +639,8 @@ const UserDashboardTab = () => {
         container
         spacing={2}
         sx={{
-          pr: lgUp ? 15 : 0,
-          pl: lgUp ? 15 : 0,
+          pr: lgUp ? 6 : 0,
+          pl: lgUp ? 6 : 0,
           pt: 2,
           display: "flex",
           position: "relative",
@@ -622,15 +691,15 @@ const UserDashboardTab = () => {
 
         {/* Limits */}
         <Grid item xs={12} alignItems="center" justifyContent="center">
-          <Card 
-            sx={{ 
+          <Card
+            sx={{
               minWidth: 50,
               m: {
                 xs: 2,
                 sm: 2,
-                md: 2
-              }
-            }} 
+                md: 2,
+              },
+            }}
             className="custom-card"
           >
             <CardContent
@@ -646,7 +715,11 @@ const UserDashboardTab = () => {
                   item
                   xs={12}
                   md={4}
-                  sx={{ p: 2, borderRight: mdDown ?  "" : "1px dashed #ccc", borderBottom: mdDown ? "1px dashed #ccc" : "" }}
+                  sx={{
+                    p: 2,
+                    borderRight: mdDown ? "" : "1px dashed #ccc",
+                    borderBottom: mdDown ? "1px dashed #ccc" : "",
+                  }}
                 >
                   <Grid container spacing={1}>
                     <Grid
@@ -702,7 +775,11 @@ const UserDashboardTab = () => {
                   item
                   xs={12}
                   md={4}
-                  sx={{ p: 2, borderRight: mdDown ?  "" : "1px dashed #ccc", borderBottom: mdDown ? "1px dashed #ccc" : ""  }}
+                  sx={{
+                    p: 2,
+                    borderRight: mdDown ? "" : "1px dashed #ccc",
+                    borderBottom: mdDown ? "1px dashed #ccc" : "",
+                  }}
                 >
                   <Grid container spacing={1}>
                     <Grid
@@ -776,14 +853,14 @@ const UserDashboardTab = () => {
 
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card
-            sx={{ 
+            sx={{
               minWidth: 50,
               m: {
                 xs: 2,
                 sm: 2,
                 md: 2,
-                lg: 0
-              } 
+                lg: 0,
+              },
             }}
             className={`custom-card ${isTempPulsating ? "pulsating" : ""}`}
           >
@@ -827,7 +904,7 @@ const UserDashboardTab = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    mt: 5
+                    mt: 5,
                   }}
                 >
                   <LoadingButton
@@ -854,14 +931,14 @@ const UserDashboardTab = () => {
         </Grid>
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card
-            sx={{ 
+            sx={{
               minWidth: 50,
               m: {
                 xs: 2,
                 sm: 2,
                 md: 2,
-                lg: 0
-              }
+                lg: 0,
+              },
             }}
             // className={`custom-card ${isHumidityPulsating ? "pulsating" : ""}`}
             className="custom-card"
@@ -906,7 +983,7 @@ const UserDashboardTab = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    mt: 5
+                    mt: 5,
                   }}
                 >
                   <LoadingButton
@@ -933,14 +1010,14 @@ const UserDashboardTab = () => {
         </Grid>
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card
-            sx={{ 
+            sx={{
               minWidth: 50,
               m: {
                 xs: 2,
                 sm: 2,
                 md: 2,
-                lg: 0
-              } 
+                lg: 0,
+              },
             }}
             className={`custom-card ${isSmokePulsating ? "pulsating" : ""}`}
           >
@@ -980,7 +1057,7 @@ const UserDashboardTab = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    mt: 5
+                    mt: 5,
                   }}
                 >
                   <LoadingButton
@@ -1037,7 +1114,7 @@ const UserDashboardTab = () => {
               marginRight: "-15px",
             }}
           /> */}
-          {/* <img
+        {/* <img
             src="/assets/illustrations/server-rack-1.png"
             alt="server rack"
             style={{
@@ -1070,38 +1147,38 @@ const UserDashboardTab = () => {
         disableEscapeKeyDown
         color="error"
         sx={{
-          border: "2px solid white", 
-          backgroundColor: "rgba(0,0,0,0.85)"
+          border: "2px solid white",
+          backgroundColor: "rgba(0,0,0,0.85)",
         }}
         maxWidth="sm"
         fullWidth
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle 
+        <DialogTitle
           className="dialog-bg"
           sx={{
-            textAlign: 'center',
-            color: 'white',
+            textAlign: "center",
+            color: "white",
             fontWeight: 700,
-            letterSpacing: '2px'
+            letterSpacing: "2px",
           }}
         >
           {"SYSTEM STATUS"}
         </DialogTitle>
-        <DialogContent 
-          className="dialog-bg" 
+        <DialogContent
+          className="dialog-bg"
           sx={{
-            textAlign: 'center',
-            color: 'white',
+            textAlign: "center",
+            color: "white",
           }}
         >
-          <DialogContentText 
+          <DialogContentText
             id="alert-dialog-slide-description"
             sx={{
-              textAlign: 'center',
-              color: 'white',
+              textAlign: "center",
+              color: "white",
               fontWeight: 700,
-              letterSpacing: '2px'
+              letterSpacing: "2px",
             }}
           >
             OFFLINE

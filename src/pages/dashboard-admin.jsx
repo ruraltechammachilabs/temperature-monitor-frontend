@@ -111,7 +111,6 @@ const TemperatureDashboardAdmin = () => {
   const handleTabChange = (event, newValue) => {
     const paths = [
       "/dashboard/home",
-      // "/dashboard/profile",
       "/dashboard/alert-users",
       "/dashboard/users",
       "/dashboard/settings",
@@ -203,7 +202,6 @@ const TemperatureDashboardAdmin = () => {
                 }}
               >
                 <Tab label="Dashboard" {...a11yProps(0)} />
-                {/* <Tab label="Profile" {...a11yProps(1)} /> */}
                 <Tab label="Alert Users" {...a11yProps(1)} />
                 <Tab label="Users" {...a11yProps(2)} />
                 <Tab label="Sensor Settings" {...a11yProps(3)} />
@@ -216,9 +214,6 @@ const TemperatureDashboardAdmin = () => {
       <CustomTabPanel value={tabValue} index={0}>
         <AdminDashboardTab />
       </CustomTabPanel>
-      {/* <CustomTabPanel value={tabValue} index={1}>
-				<ProfileTab />
-			</CustomTabPanel> */}
       <CustomTabPanel value={tabValue} index={1}>
         <AlertUsersTab />
       </CustomTabPanel>
@@ -232,6 +227,10 @@ const TemperatureDashboardAdmin = () => {
   );
 };
 
-const MemoisedTemperatureDashboardAdmin = memo(TemperatureDashboardAdmin);
+ 
+ 
+ const MemoisedTemperatureDashboardAdmin = memo(TemperatureDashboardAdmin);
+ export default MemoisedTemperatureDashboardAdmin; 
+ 
 
-export default MemoisedTemperatureDashboardAdmin;
+/* export default TemperatureDashboardAdmin */

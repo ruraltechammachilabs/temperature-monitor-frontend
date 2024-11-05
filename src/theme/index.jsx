@@ -22,6 +22,15 @@ const ThemeProvider = ({ children }) => {
       shadows: shadows(),
       customShadows: customShadows(),
       shape: { borderRadius: 8 },
+      breakpoints: {
+        values: {
+          xs: 0,
+          sm: 600,
+          md: 800, // Adjust the md breakpoint to 800px
+          lg: 1200,
+          xl: 1536,
+        },
+      },
     }),
     []
   );

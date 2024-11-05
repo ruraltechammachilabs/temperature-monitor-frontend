@@ -204,6 +204,7 @@ const TemperatureDashboardUser = () => {
   );
 };
 
-const MemoisedTemperatureDashboardUser = memo(TemperatureDashboardUser);
+/* const MemoisedTemperatureDashboardUser = memo(TemperatureDashboardUser);
 
-export default MemoisedTemperatureDashboardUser;
+export default MemoisedTemperatureDashboardUser; */
+export default TemperatureDashboardUser;

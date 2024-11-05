@@ -38,7 +38,7 @@ const SlideTransition = (props) => {
 };
 
 export default function AccountPopover() {
-  const { currentUser, dbUser } = useContext(AuthContext);
+  const { currentUser, dbUser, setCurrentUser, setDbUser } = useContext(AuthContext);
   const [open, setOpen] = useState(null);
   const navigate = useNavigate();
   const [account, setAccount] = useState({
@@ -111,27 +111,22 @@ export default function AccountPopover() {
     signOut(auth)
       .then(() => {
         // Sign-out successful
-        handleSnackbarOpen(SlideTransition);
+        handleSnackbarOpen(SlideTransition)
+        
+        setCurrentUser({})
+        setDbUser({})
         navigate("/auth/login");
-        localStorage.removeItem("userInfo");
-        localStorage.removeItem("dbuser");
+
+        localStorage.removeItem("user")
+        localStorage.removeItem("userInfo")
+        localStorage.removeItem("dbuser")
+        localStorage.removeItem("prevTime")
       })
       .catch((error) => {
-        // An error happened
         console.log(error);
       });
     setOpen(null);
   };
-
-  // const handleMenuItemClick = (label) => {
-  // 	if (label === "Home") {
-  // 		navigate("/dashboard/home");
-  // 		handleClose();
-  // 	} else if (label === "Profile") {
-  // 		navigate("/dashboard/profile");
-  // 		handleClose();
-  // 	}
-  // };
 
   return (
     <>

@@ -161,7 +161,7 @@ const TelegramBotConfig = () => {
       >
         <Grid item xs={12}>
           <Grid container>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={12} md={12} lg={12}>
               <Typography
                 variant="h6"
                 sx={{

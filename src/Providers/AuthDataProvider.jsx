@@ -1,6 +1,5 @@
 import { useState, useEffect, createContext } from "react";
 import { auth } from "../firebase/firebaseConfig";
-import { getUserByUid } from "../firebase/UserOperations";
 
 export const AuthContext = createContext({
 	currentUser: {},
@@ -23,10 +22,10 @@ export const AuthProvider = ({ children }) => {
 		const unsubscribe = auth.onAuthStateChanged(async (user) => {
 			if (isNewUser) {
 				setCurrentUser(user);
+				setLoading(false);  
 				// const dbuser = await getUserByUid(user.email);
 				// setDbUser(dbuser)
-				localStorage.setItem("userInfo", JSON.stringify(user));
-				setLoading(false);  
+				// localStorage.setItem("userInfo", JSON.stringify(user));
 			}
 		});
 

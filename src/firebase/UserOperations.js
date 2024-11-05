@@ -68,7 +68,7 @@ export const addUser = async (displayName, email, password, role) => {
 
 export const getUserByUid = async (email) => {
 	try {
-		const dbRef = ref(fbDB, "users/");
+		const dbRef = ref(fbDB, "users");
 		const snapshot = await get(
 			query(dbRef, orderByChild("email"), equalTo(email))
 		);
@@ -178,9 +178,9 @@ export const updateCurrentUserProfile = async (
 				}
 			);
 
-			console.log(
-				"User display name updated successfully in Realtime DB"
-			);
+			// console.log(
+			// 	"User display name updated successfully in Realtime DB"
+			// );
 		} else {
 			console.log("User not found");
 		}

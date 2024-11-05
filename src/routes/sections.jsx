@@ -4,7 +4,7 @@ import { Outlet, Navigate, useRoutes } from "react-router-dom";
 import DashboardLayout from "../layouts/dashboard";
 import AuthPage from "../layouts/Auth/AuthPage";
 import PrivateRoute from "./PrivateRoute";
-// import TemperatureDashboard from '../pages/temperature-dashboard'
+import LoginForm from "../layouts/Auth/LoginForm";
 
 export const TemperatureDashboard = lazy(() => import("../pages/temperature-dashboard"));
 export const Page404 = lazy(() => import("../pages/page-not-found"));
@@ -28,7 +28,7 @@ export const Router = () => {
 					</PrivateRoute>
 			),
 			children: [
-				{ element: <Navigate to="/dashboard/home" replace />, index: true },
+				/* { element: <Navigate to="/dashboard/home" replace />, index: true }, */
 				{ 
 					path: "home", 
 					element: <TemperatureDashboard />,
@@ -58,8 +58,7 @@ export const Router = () => {
 			element: <AuthPage />,
 			children: [
 				{ path: 'login', index: true },
-				// { path: "login", element: <AuthPage /> },
-				// { path: "register", element: <AuthPage /> },
+				{ path: 'login', element: <LoginForm /> },
 			],
 		},
 		{

@@ -1,4 +1,4 @@
-import { useState, useRef, useContext } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 /* MUI */
@@ -18,12 +18,12 @@ import { AnimatePresence } from "framer-motion";
 import { grey } from "../../theme/palette";
 import FadeIn from "/src/components/Animations/FadeIn";
 import TrendingFlatOutlinedIcon from "@mui/icons-material/TrendingFlatOutlined";
-import { signInUser } from "../../firebase/UserOperations";
+import { signInUser, getUserByUid } from "../../firebase/UserOperations";
 import { AuthContext } from "../../Providers/AuthDataProvider";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const { setCurrentUser } = useContext(AuthContext);
+  const { currentUser, setCurrentUser, dbUser, setDbUser } = useContext(AuthContext);
 
   const [showPassword, setShowPassword] = useState(false);
   const emailFieldRef = useRef();
@@ -42,13 +42,14 @@ const LoginForm = () => {
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("userInfo", JSON.stringify(userInfo));
 
-        // Store user information securely
-        const token = user.accessToken;
-        localStorage.setItem("userToken", token);
-
-        if (user) {
+        /* Previous code */
+        /* if (user) {
           setCurrentUser(user);
           navigate("/dashboard/home");
+        } */
+
+        if (user) {
+          setUserInformation(user);
         }
       })
       .catch((error) => {
@@ -57,6 +58,47 @@ const LoginForm = () => {
         console.log(errorCode, errorMessage);
       });
   };
+
+  const setUserInformation = async (user) => {
+    if (!user || Object.keys(user).length === 0) {
+      console.error("User is invalid");
+      return;
+    }
+
+    setCurrentUser(user);
+
+    try {
+      /* Fetch User from Realtime DB */
+      const userdata = await getUserByUid(user.email);
+      if (userdata) {
+        setDbUser(userdata);
+      } else {
+        console.error("User data not found");
+      }
+    } catch (error) {
+      console.error("Error fetching user", error);
+    }
+  };
+
+  useEffect(() => {
+    const localUser = JSON.parse(localStorage.getItem("user"));
+    if(localUser !== null && localUser !== undefined) {
+      setUserInformation(localUser)
+    }
+  }, []);
+
+  useEffect(() => {
+
+    const localUser = JSON.parse(localStorage.getItem("user"));
+
+    if (Object.keys(currentUser).length > 0 && Object.keys(dbUser).length > 0) {
+      navigate("/dashboard/home")
+    } else if (localUser !== null && localUser !== undefined) {
+      navigate("/dashboard/home")
+    }
+  }, [currentUser, dbUser]); // Watch for currentUser and dbUser changes
+
+  
 
   return (
     <>
@@ -102,28 +144,12 @@ const LoginForm = () => {
               />
             </Stack>
 
-            {/* <Stack
-							direction="row"
-							alignItems="center"
-							justifyContent="space-between"
-							sx={{ my: 2 }}
-						>
-							<Link
-								variant="subtitle2"
-								underline="hover"
-								href="/reset"
-								justifyContent="right"
-							>
-								Forgot password?
-							</Link>
-						</Stack> */}
-
             <LoadingButton
               fullWidth
               size="large"
               type="submit"
               variant="contained"
-              onClick={handleClick}
+              onClick={() => handleClick()}
               sx={{
                 backgroundImage:
                   "linear-gradient(to right, rgba(177,15,87,0.8) 0%, rgba(209,9,70,0.6) 	35%, rgba(255,40,107,0.5) 70%, rgba(174,0,94,0.5) 100%)",

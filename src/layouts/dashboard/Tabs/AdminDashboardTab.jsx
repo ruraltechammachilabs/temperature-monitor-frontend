@@ -1,6 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
 /* React */
-// import { useContext } from "react";
 import { useState, useEffect, useRef, useContext, forwardRef } from "react";
 
 /* MUI */
@@ -30,7 +29,6 @@ import {
   Slide,
   DialogActions,
   Button,
-  Fade
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 
@@ -85,10 +83,10 @@ import { getLimitedAlertUsers } from "../../../firebase/AlertUserOperations";
 import CurrentTime from "../../../components/current-time/CurrentTime";
 import { GlobalDataContext } from "../../../Providers/GlobalDataProvider";
 import {
+  getChartDataByDateTime,
   // convertToTimestamp,
   // setRealtimeValues,
-  getChartDataByDateTime,
-  convertDateStringToMilliseconds
+  // convertDateStringToMilliseconds
 } from "../../../firebase/operations";
 import { useNavigate } from "react-router-dom";
 // import { setThreshold } from "../../../services/monitoringSlice";
@@ -128,15 +126,19 @@ const AdminDashboardTab = () => {
 
   /* Graphs */
   const [mainGraphData, setMainGraphData] = useState([]);
+  const [isGraphUpdated, setIsGraphUpdated] = useState(false)
+
   const [showTempGraph, setShowTempGraph] = useState(false);
   const [showHumidGraph, setShowHumidGraph] = useState(false);
   const [showSmokeGraph, setShowSmokeGraph] = useState(false);
 
+
+
   /* UI */
 
-  const [currentAlertNumber, setCurrentAlertNumber] = useState(" ")
-  const [currentAlertUser, setCurrentAlertUser] = useState({})
-  const navigate = useNavigate()
+  const [currentAlertNumber, setCurrentAlertNumber] = useState(" ");
+  const [currentAlertUser, setCurrentAlertUser] = useState({});
+  const navigate = useNavigate();
 
   // const [resolution, setResolution] = useState({
   //   width: window.innerWidth,
@@ -218,10 +220,10 @@ const AdminDashboardTab = () => {
   /* Alert User Snackbar methods */
   const handleDeleteUserSnackbarOpen = () => () => {
     setDeleteUserSnackbarState({
-      open: true
+      open: true,
     });
   };
-  
+
   const handleDeleteUserSnackbarClose = () => () => {
     setDeleteUserSnackbarState({
       open: false,
@@ -264,16 +266,16 @@ const AdminDashboardTab = () => {
 
   const handleOpenDeleteDialog = (user) => {
     setOpenDeleteDialog(true);
-    setCurrentAlertNumber(user.phone)
-    setCurrentAlertUser(user)
+    setCurrentAlertNumber(user.phone);
+    setCurrentAlertUser(user);
   };
 
   const handleAgreeDeleteDialog = (user) => {
-    handleDeleteUserSnackbarOpen()
-    handleCloseDeleteDialog()
-    handleDeleteAlertUser(user)
-  }
-  
+    handleDeleteUserSnackbarOpen();
+    handleCloseDeleteDialog();
+    handleDeleteAlertUser(user);
+  };
+
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false);
   };
@@ -521,8 +523,15 @@ const AdminDashboardTab = () => {
       setMainGraphData(mainData);
     };
 
-    fetchLiveData();
-  }, []);
+    if(isGraphUpdated) {
+      
+      fetchLiveData();
+
+      setTimeout(() => {
+        setIsGraphUpdated(false)
+      }, 200);
+    }
+  }, [isGraphUpdated]);
 
   /* Temperature Changes Alert */
   useEffect(() => {
@@ -633,17 +642,18 @@ const AdminDashboardTab = () => {
     }
   }, [isNewAlertUserAdded, isAlertUserRemoved]);
 
-  /* 
-    * Check System Status
-    * If Sensor Data has not been received in 4 minutes, then system goes to offline mode
-    * If data arrives, then the interval is reset back to to 0 
-  */
+  /*
+   * Check System Status
+   * If Sensor Data has not been received in 4 minutes, then system goes to offline mode
+   * If data arrives, then the interval is reset back to to 0
+   */
 
   useEffect(() => {
     if (data) {
-
-      // Run the 2-second interval check and stop it after 2 minutes
+      // Run the 2-second interval check and stop it after 4 minutes
       startChecking();
+
+      localStorage.setItem("prevTime", Date.now());
 
       // Cleanup both the interval and the timeout when `data` is updated or component unmounts
       return () => {
@@ -661,42 +671,58 @@ const AdminDashboardTab = () => {
     // Perform an immediate system check
     performSystemCheck();
 
-    // Start the interval to check every 2 seconds
+    // Start the interval to check every 1 minute
     intervalRef.current = setInterval(() => {
       performSystemCheck();
-    }, 2000);
+    }, 60000);
 
-    // Stop the interval after 2 minutes
+    // Stop the interval after 4 minutes
     timeoutRef.current = setTimeout(() => {
       clearInterval(intervalRef.current); // Clear the interval after 2 minutes
       // console.log(
       //   "4-minute checking ended. No further checks until data is updated."
       // );
+
+      /* Find Time Difference & check system offline or online */
+      const now = Date.now();
+      const prev = Number(localStorage.getItem("prevTime"));
+      if(prev !== 0) {
+        const timestampDiff = now - prev;
+  
+        if (data && timestampDiff < 240000) {
+          setSystemStatus("online");
+        } else {
+          setSystemStatus("offline");
+        }
+      }
     }, 240000);
   };
 
   const performSystemCheck = async () => {
     // Perform logic to check if the system is on or off
-    const currentTimestamp = await convertDateStringToMilliseconds(data.Timestamp)
-    const timestampDiff = Date.now() - currentTimestamp
-
-    if (data && (timestampDiff < 240000)) {
-      setSystemStatus("online");
-    } else {
-      setSystemStatus("offline");
+    const now = Date.now();
+    const prev = Number(localStorage.getItem("prevTime"));
+    if(prev !== 0) {
+      const timestampDiff = now - prev;
+  
+      if (data && timestampDiff < 240000) {
+        setSystemStatus("online");
+      } else {
+        setSystemStatus("offline");
+      }
     }
   };
 
   /* Mute Alerts if System Offline */
   useEffect(() => {
-    if(systemStatus === 'offline') {
+    if (systemStatus === "offline") {
       audio1Ref.current.muted = true;
       audio3Ref.current.muted = true;
     } else {
       audio1Ref.current.muted = false;
       audio3Ref.current.muted = false;
     }
-  }, [systemStatus])
+  }, [systemStatus]);
 
   /* System Actions */
 
@@ -722,8 +748,6 @@ const AdminDashboardTab = () => {
         setIsAlertUserRemoved(false);
       }, 500);
     });
-
-    
   };
 
   /* Audio Actions */
@@ -736,31 +760,32 @@ const AdminDashboardTab = () => {
   const checkIfMuted = (isMute) => {
     if (isMute) {
       audio1Ref.current.muted = true;
-      // audio2Ref.current.muted = true;
       audio3Ref.current.muted = true;
     } else {
       audio1Ref.current.muted = false;
-      // audio2Ref.current.muted = false;
       audio3Ref.current.muted = false;
     }
   };
 
   /* Toggle Button Click Events for Viewing Graph */
   const handleTempGraphButtonClick = () => {
+    setIsGraphUpdated(true)
     setShowTempGraph(!showTempGraph);
   };
 
   const handleHumidityGraphButtonClick = () => {
+    setIsGraphUpdated(true)
     setShowHumidGraph(!showHumidGraph);
   };
 
   const handleSmokeGraphButtonClick = () => {
+    setIsGraphUpdated(true)
     setShowSmokeGraph(!showSmokeGraph);
   };
 
   const navigateUsers = () => {
-    navigate('/dashboard/alert-users')
-  }
+    navigate("/dashboard/alert-users");
+  };
 
   return (
     <>
@@ -771,7 +796,6 @@ const AdminDashboardTab = () => {
         <Grid item xs={12}>
           <Alert
             severity="error"
-            // sx={{ display: isTempPulsating ? "block" : "none" }}
             sx={{
               justifyContent: "center",
               textAlign: "center",
@@ -780,7 +804,7 @@ const AdminDashboardTab = () => {
             className="alert-box"
           >
             <AlertTitle style={{ textAlign: "center" }}>WARNING</AlertTitle>
-            CRITICAL ALERT - TEMPERATURE EXCEEDED { data.Temperature } 
+            CRITICAL ALERT - TEMPERATURE EXCEEDED !! {data.Temperature}
           </Alert>
           {/* <Alert
             severity="error"
@@ -805,7 +829,7 @@ const AdminDashboardTab = () => {
             className="alert-box"
           >
             <AlertTitle style={{ textAlign: "center" }}>WARNING</AlertTitle>
-            CRITICAL ALERT - SMOKE EXCEEDED { data.Smoke } 
+            CRITICAL ALERT - SMOKE EXCEEDED !! {data.Smoke}
           </Alert>
         </Grid>
       </Grid>
@@ -813,8 +837,8 @@ const AdminDashboardTab = () => {
         container
         spacing={2}
         sx={{
-          pr: mdUp ? 15 : 0,
-          pl: mdUp ? 15 : 0,
+          pr: mdUp ? 6 : 0,
+          pl: mdUp ? 6 : 0,
           pt: 2,
           display: "flex",
           position: "relative",
@@ -830,7 +854,7 @@ const AdminDashboardTab = () => {
               justifyContent: "end",
               width: "100%",
               mb: 2,
-              p: 2
+              p: 2,
             }}
           >
             <IconButton
@@ -877,29 +901,6 @@ const AdminDashboardTab = () => {
               </span>
             </IconButton>
 
-            {/* <IconButton
-              aria-label="Delete Nodes Button"
-              className="reboot-button"
-              sx={{
-                ml: 2,
-                p: 2,
-                display: "flex",
-                flexDirection: "column",
-              }}
-              onClick={deleteNodesWithoutTimestampTime}
-            >
-              <DeleteForeverIcon sx={{ width: 35, height: 35 }} />
-              <span
-                style={{
-                  marginTop: "5px",
-                  fontSize: "small",
-                  letterSpacing: 1,
-                }}
-              >
-                Delete
-              </span>
-            </IconButton> */}
-
             <IconButton
               aria-label="Audio Mute Button"
               className="reboot-button"
@@ -931,21 +932,16 @@ const AdminDashboardTab = () => {
         <CurrentTime />
 
         {/* Limits */}
-        <Grid 
-          item 
-          xs={12} 
-          alignItems="center" 
-          justifyContent="center"
-        >
-          <Card 
-            sx={{ 
-              minWidth: 50, 
+        <Grid item xs={12} alignItems="center" justifyContent="center">
+          <Card
+            sx={{
+              minWidth: 50,
               m: {
                 xs: 2,
                 sm: 2,
-                md: 2
-              } 
-            }} 
+                md: 2,
+              },
+            }}
             className="custom-card"
           >
             <CardContent
@@ -961,7 +957,11 @@ const AdminDashboardTab = () => {
                   item
                   xs={12}
                   md={4}
-                  sx={{ p: 2, borderRight: "1px dashed #ccc" }}
+                  sx={{
+                    p: 2,
+                    borderRight: mdDown ? "" : "1px dashed #ccc",
+                    borderBottom: mdDown ? "1px dashed #ccc" : "",
+                  }}
                 >
                   <Grid container spacing={1}>
                     <Grid
@@ -1017,7 +1017,11 @@ const AdminDashboardTab = () => {
                   item
                   xs={12}
                   md={4}
-                  sx={{ p: 2, borderRight: "1px dashed #ccc" }}
+                  sx={{
+                    p: 2,
+                    borderRight: mdDown ? "" : "1px dashed #ccc",
+                    borderBottom: mdDown ? "1px dashed #ccc" : "",
+                  }}
                 >
                   <Grid container spacing={1}>
                     <Grid
@@ -1167,13 +1171,13 @@ const AdminDashboardTab = () => {
         </Grid> */}
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card
-            sx={{ 
+            sx={{
               minWidth: 50,
               m: {
                 xs: 2,
                 sm: 2,
-                md: 2
-              } 
+                md: 2,
+              },
             }}
             className={`custom-card ${isTempPulsating ? "pulsating" : ""}`}
           >
@@ -1272,13 +1276,13 @@ const AdminDashboardTab = () => {
         </Grid>
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           <Card
-            sx={{ 
+            sx={{
               minWidth: 50,
               m: {
                 xs: 2,
                 sm: 2,
-                md: 2
-              } 
+                md: 2,
+              },
             }}
             // className={`custom-card ${isHumidityPulsating ? "pulsating" : ""}`}
             className="custom-card"
@@ -1374,13 +1378,13 @@ const AdminDashboardTab = () => {
         <Grid item xs={12} md={4} alignItems="center" justifyContent="center">
           {/* <QuickBanner percent={0.45} name="Smoke" /> */}
           <Card
-            sx={{ 
+            sx={{
               minWidth: 50,
               m: {
                 xs: 2,
                 sm: 2,
-                md: 2
-              } 
+                md: 2,
+              },
             }}
             className={`custom-card ${isSmokePulsating ? "pulsating" : ""}`}
           >
@@ -1483,8 +1487,8 @@ const AdminDashboardTab = () => {
               m: {
                 xs: 2,
                 sm: 2,
-                md: 2
-              }
+                md: 2,
+              },
             }}
             className="custom-card"
           >
@@ -1511,8 +1515,8 @@ const AdminDashboardTab = () => {
               m: {
                 xs: 2,
                 sm: 2,
-                md: 2
-              }
+                md: 2,
+              },
             }}
             className="custom-card"
           >
@@ -1765,7 +1769,9 @@ const AdminDashboardTab = () => {
         }}
         open={deleteUserSnackbarState.open}
         onClose={handleDeleteUserSnackbarClose}
-        message={"Alert number \"" + currentAlertNumber + "\" deleted successfully"}
+        message={
+          'Alert number "' + currentAlertNumber + '" deleted successfully'
+        }
         key={vertical + horizontal + currentAlertNumber}
         autoHideDuration={3000}
       />
@@ -1778,38 +1784,38 @@ const AdminDashboardTab = () => {
         disableEscapeKeyDown
         color="error"
         sx={{
-          border: "2px solid white", 
-          backgroundColor: "rgba(0,0,0,0.85)"
+          border: "2px solid white",
+          backgroundColor: "rgba(0,0,0,0.85)",
         }}
         maxWidth="sm"
         fullWidth
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle 
+        <DialogTitle
           className="dialog-bg"
           sx={{
-            textAlign: 'center',
-            color: 'white',
+            textAlign: "center",
+            color: "white",
             fontWeight: 700,
-            letterSpacing: '2px'
+            letterSpacing: "2px",
           }}
         >
           {"SYSTEM STATUS"}
         </DialogTitle>
-        <DialogContent 
-          className="dialog-bg" 
+        <DialogContent
+          className="dialog-bg"
           sx={{
-            textAlign: 'center',
-            color: 'white',
+            textAlign: "center",
+            color: "white",
           }}
         >
-          <DialogContentText 
+          <DialogContentText
             id="alert-dialog-slide-description"
             sx={{
-              textAlign: 'center',
-              color: 'white',
+              textAlign: "center",
+              color: "white",
               fontWeight: 700,
-              letterSpacing: '2px'
+              letterSpacing: "2px",
             }}
           >
             OFFLINE
@@ -1827,13 +1833,15 @@ const AdminDashboardTab = () => {
         <DialogTitle>{"Delete Selected Number ?"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            The mobile number "{ currentAlertNumber }" will no longer receive Alerts.
-            Are you sure you want to delete the user ?
+            The mobile number "{currentAlertNumber}" will no longer receive
+            Alerts. Are you sure you want to delete the user ?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteDialog}>Disagree</Button>
-          <Button onClick={() => handleAgreeDeleteDialog(currentAlertUser)}>Agree</Button>
+          <Button onClick={() => handleAgreeDeleteDialog(currentAlertUser)}>
+            Agree
+          </Button>
         </DialogActions>
       </Dialog>
     </>
