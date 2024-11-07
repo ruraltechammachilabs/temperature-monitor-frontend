@@ -42,9 +42,23 @@ export default function useChart(options) {
 
     // Chart
     chart: {
-      toolbar: { show: false },
-      zoom: { enabled: false },
-      // animations: { enabled: false },
+      stacked: false,
+      toolbar: { 
+        // show: true,
+        autoSelected: 'zoom'
+      },
+      zoom: { 
+        type: 'x',
+        enabled: true,
+        autoScaleYaxis: true
+      },
+      animations: { 
+        enabled: true,
+        easing: 'linear',
+        dynamicAnimation: {
+          speed: 1000, // Set the speed of real-time update animation
+        },
+      },
       foreColor: theme.palette.text.disabled,
       fontFamily: theme.typography.fontFamily,
     },

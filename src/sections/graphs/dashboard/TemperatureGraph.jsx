@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-
+import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
 import Box from "@mui/material/Box";
 
+import ApexCharts from 'apexcharts'
 import Chart, { useChart } from "../../../components/chart";
 // import { getChartData, getChartDataByDateTime } from "../../../firebase/operations";
 // import { fbDB } from "../../../firebase/firebaseConfig";
@@ -12,6 +12,7 @@ import Chart, { useChart } from "../../../components/chart";
 export const TemperatureGraph = ({chartInfo}) => {
 
   const [chartData, setChartData] = useState([]);
+  const chartRef = useRef(null);
   // const { tempGraphData } = useContext(GraphDataContext)
 
   const chartOptions = useChart({
@@ -19,6 +20,7 @@ export const TemperatureGraph = ({chartInfo}) => {
     //   type: series.map((i) => i.fill),
     // },  
     // labels,
+    id: 'realtime-chart',
     xaxis: {
       type: 'datetime',
       labels: {
@@ -48,7 +50,6 @@ export const TemperatureGraph = ({chartInfo}) => {
         },
       },
     },
-    // ...options,
   });
 
   useEffect(() => {
@@ -56,6 +57,18 @@ export const TemperatureGraph = ({chartInfo}) => {
       setChartData(chartInfo)
     }
   }, [chartInfo])
+
+  // Trigger update when chartData changes
+  useEffect(() => {
+    ApexCharts.exec('realtime-chart', 'updateSeries', [
+      {
+        name: "Temperature",
+        type: "area",
+        fill: "gradient",
+        data: chartData,
+      },
+    ]);
+  }, [chartData]);
 
   // useEffect(() => {
   //   if(tempGraphData) {
@@ -84,6 +97,9 @@ export const TemperatureGraph = ({chartInfo}) => {
   return (
       <Box sx={{ p: 1 }}>
         <Chart
+          key={chartData.length}
+          
+          ref={chartRef}
           dir="ltr"
           type="area"
           // series={[data: chartData]}
@@ -95,7 +111,7 @@ export const TemperatureGraph = ({chartInfo}) => {
           }]}
           options={chartOptions}
           width="100%"
-          height={200}
+          height={300}
         />
       </Box>
   );
