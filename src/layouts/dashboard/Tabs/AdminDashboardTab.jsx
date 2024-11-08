@@ -680,7 +680,7 @@ const AdminDashboardTab = () => {
     timeoutRef.current = setTimeout(() => {
       clearInterval(intervalRef.current); // Clear the interval after 2 minutes
       // console.log(
-      //   "4-minute checking ended. No further checks until data is updated."
+      //   "2-minute checking ended. No further checks until data is updated."
       // );
 
       /* Find Time Difference & check system offline or online */
@@ -689,13 +689,13 @@ const AdminDashboardTab = () => {
       if(prev !== 0) {
         const timestampDiff = now - prev;
   
-        if (data && timestampDiff < 240000) {
+        if (data && timestampDiff < 120000) {
           setSystemStatus("online");
         } else {
           setSystemStatus("offline");
         }
       }
-    }, 240000);
+    }, 120000);
   };
 
   const performSystemCheck = async () => {
@@ -705,7 +705,7 @@ const AdminDashboardTab = () => {
     if(prev !== 0) {
       const timestampDiff = now - prev;
   
-      if (data && timestampDiff < 240000) {
+      if (data && timestampDiff < 120000) {
         setSystemStatus("online");
       } else {
         setSystemStatus("offline");

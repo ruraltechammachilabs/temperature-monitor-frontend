@@ -42,9 +42,8 @@ export default function useChart(options) {
 
     // Chart
     chart: {
-      stacked: false,
+      // stacked: false,
       toolbar: { 
-        // show: true,
         autoSelected: 'zoom'
       },
       zoom: { 

@@ -117,9 +117,7 @@ const HumidityRangeSettings = () => {
   }, [humidRanges]);
 
   const handleHumidLimitsSubmit = () => {
-    console.log(lowHumidity, normalHumidity);
     setHumidRange(lowHumidity, normalHumidity).then(() => {
-      // console.log("Humidity Range updated successfully !");
       setState((prev) => {
         return { ...prev, open: true };
       });
