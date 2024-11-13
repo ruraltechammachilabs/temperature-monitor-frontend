@@ -205,17 +205,17 @@ export const getChartDataByDateTime = async () => {
       };
 
       const tempChartData = monitorData.map((item) => {
-        const tempData = [convertToTimestamp(item.Timestamp), item.Temperature];
+        const tempData = [item.TimestampTime, item.Temperature];
         return tempData;
       });
 
       const humidChartData = monitorData.map((item) => {
-        const tempData = [convertToTimestamp(item.Timestamp), item.Humidity];
+        const tempData = [item.TimestampTime, item.Humidity];
         return tempData;
       });
 
       const smokeChartData = monitorData.map((item) => {
-        const tempData = [convertToTimestamp(item.Timestamp), item.Smoke];
+        const tempData = [item.TimestampTime, item.Smoke];
         return tempData;
       });
 

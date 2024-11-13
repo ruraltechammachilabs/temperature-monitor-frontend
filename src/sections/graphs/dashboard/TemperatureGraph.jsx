@@ -68,6 +68,7 @@ export const TemperatureGraph = ({chartInfo}) => {
         data: chartData,
       },
     ]);
+    console.log(chartData)
   }, [chartData]);
 
   // useEffect(() => {
