@@ -174,7 +174,13 @@ const UserDashboardTab = () => {
   useEffect(() => {
     const fetchDataAndUpdateState = async () => {
       const data = await fetchData("Data_reads");
-      setData(data);
+      if(
+        data.Temperature >= 10 && 
+        data.Temperature < 40 && 
+        data.Humidity > 10
+      ) {
+        setData(data);
+      }
       loadRangeData();
     };
 
@@ -208,7 +214,14 @@ const UserDashboardTab = () => {
     fetchDataAndUpdateState();
 
     const unsubscribe = listenForDocumentChanges((newData) => {
-      setData(newData);
+
+      if(
+        newData.Temperature >= 10 && 
+        newData.Temperature < 40 && 
+        newData.Humidity > 10
+      ) {
+        setData(newData);
+      }
       const ranges = JSON.parse(localStorage.getItem("ranges"));
       if (ranges === null || ranges === undefined) {
         loadRangeData().then(() => {

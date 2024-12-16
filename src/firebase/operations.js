@@ -315,3 +315,55 @@ export const setTelegramCredentials = async (chatId, token) => {
     TOKEN: token,
   });
 };
+
+export const calculateAvg = async () => {
+  try {
+    const now = new Date().getTime();
+    const twentyFourHoursAgo = now - 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+    const dbRef = ref(fbDB, "monitor");
+    const timestampRef = query(
+      dbRef,
+      orderByChild("TimestampTime"),
+      startAt(twentyFourHoursAgo),
+      endAt(now)
+    );
+    const snapshot = await get(timestampRef);
+
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      const monitorData = Object.values(data);
+      
+
+      let tempSum = 0
+      let humidSum = 0
+      let smokeSum = 0
+
+      const avgArr = {
+        temperature: 0,
+        humidity: 0,
+        smoke: 0,
+      };
+
+
+      monitorData.forEach((item) => {
+        tempSum += item.Temperature
+        humidSum += item.Humidity
+        smokeSum += item.Smoke
+      });
+
+      avgArr.temperature = (tempSum / monitorData.length).toFixed(2)
+      avgArr.humidity = (humidSum / monitorData.length).toFixed(2)
+      avgArr.smoke = (smokeSum / monitorData.length).toFixed(2)
+      
+
+      return avgArr;
+    } else {
+      console.log("No recent data found");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching recent data:", error);
+    throw error;
+  }
+}

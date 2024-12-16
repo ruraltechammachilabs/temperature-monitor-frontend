@@ -71,6 +71,7 @@ import {
   listenForTempRangeChanges,
   listenForHumidRangeChanges,
   listenForSmokeRangeChanges,
+  calculateAvg,
   // deleteNodesWithoutTimestampTime
 } from "../../../firebase/operations";
 import { deleteAlertUser } from "../../../firebase/AlertUserOperations";
@@ -124,6 +125,8 @@ const AdminDashboardTab = () => {
 
   const [alertUsers, setAlertUsers] = useState([]);
 
+  const [averageArr, setAverageArr] = useState([])
+
   /* Graphs */
   const [mainGraphData, setMainGraphData] = useState([]);
   const [isGraphUpdated, setIsGraphUpdated] = useState(false)
@@ -140,57 +143,6 @@ const AdminDashboardTab = () => {
   const [currentAlertUser, setCurrentAlertUser] = useState({});
   const navigate = useNavigate();
 
-  // const [resolution, setResolution] = useState({
-  //   width: window.innerWidth,
-  //   height: window.innerHeight
-  // });
-
-  // useEffect(() => {
-  //   // Function to update the resolution state when the window is resized
-  //   const handleResize = () => {
-  //     setResolution({
-  //       width: window.innerWidth,
-  //       height: window.innerHeight
-  //     });
-  //   };
-
-  //   // Add an event listener to detect window resizing
-  //   window.addEventListener('resize', handleResize);
-
-  //   // Clean up the event listener when the component unmounts
-  //   return () => {
-  //     window.removeEventListener('resize', handleResize);
-  //   };
-  // }, []);
-
-  /* Define media queries for different breakpoints */
-  // const isXSmall = useMediaQuery('(max-width:600px)');
-  // const isSmall = useMediaQuery('(min-width:601px) and (max-width:960px)');
-  // const isMedium = useMediaQuery('(min-width:961px) and (max-width:1280px)');
-  // const isLarge = useMediaQuery('(min-width:1281px) and (max-width:1920px)');
-  // const isXLarge = useMediaQuery('(min-width:1921px)');
-
-  // const [resolution, setResolution] = useState("");
-
-  // useEffect(() => {
-  //   if (isXSmall) {
-  //     setResolution("Extra Small (≤600px)");
-  //   } else if (isSmall) {
-  //     setResolution("Small (601px - 960px)");
-  //   } else if (isMedium) {
-  //     setResolution("Medium (961px - 1280px)");
-  //   } else if (isLarge) {
-  //     setResolution("Large (1281px - 1920px)");
-  //   } else if (isXLarge) {
-  //     setResolution("Extra Large (≥1921px)");
-  //   }
-  // }, [isXSmall, isSmall, isMedium, isLarge, isXLarge]);
-
-  /* monitor Redux state */
-  // const storedTemperature = useSelector((state) => state.monitor.temperature)
-  // const storedHumidity = useSelector((state) => state.monitor.humidity)
-  // const storedSmoke = useSelector((state) => state.monitor.smoke)
-  // const dispatch = useDispatch()
 
   /* snackbar alert */
   const [state, setState] = useState({
@@ -350,7 +302,13 @@ const AdminDashboardTab = () => {
   useEffect(() => {
     const fetchDataAndUpdateState = async () => {
       const data = await fetchData("Data_reads");
-      setData(data);
+      if(
+        data.Temperature >= 10 && 
+        data.Temperature < 40 && 
+        data.Humidity > 10
+      ) {
+        setData(data);
+    }
       loadRangeData();
     };
 
@@ -385,7 +343,14 @@ const AdminDashboardTab = () => {
     fetchDataAndUpdateState();
 
     const unsubscribe = listenForDocumentChanges((newData) => {
-      setData(newData);
+      console.log("new Data => ", newData)
+      if(
+          newData.Temperature >= 10 && 
+          newData.Temperature < 40 && 
+          newData.Humidity > 10
+        ) {
+          setData(newData);
+      }
 
       /* Check & Update System Status */
 
@@ -433,6 +398,8 @@ const AdminDashboardTab = () => {
           // };
 
           // setRealtimeValues(modifiedNewData);
+
+          
         });
       } else {
         /* Play Alert Sound if Temp > Limit  */
@@ -489,7 +456,16 @@ const AdminDashboardTab = () => {
       handlePause1();
       setIsTempPulsating(false);
     }
-  }, [data, tempRanges]);
+
+    /* Smoke */
+    if (data.Smoke > smokeRanges.smoke_limit) {
+      handlePlay3();
+      setIsSmokePulsating(true);
+    } else {
+      handlePause3();
+      setIsSmokePulsating(false);
+    }
+  }, [data, tempRanges, smokeRanges]);
 
   // useEffect(() => {
   //   /* Humidity */
@@ -503,17 +479,17 @@ const AdminDashboardTab = () => {
   //   }
   // }, [humidRanges]);
 
-  useEffect(() => {
-    /* Smoke */
-    // if (newData.Smoke > ranges.Smoke) {
-    if (data.Smoke > smokeRanges.smoke_limit) {
-      handlePlay3();
-      setIsSmokePulsating(true);
-    } else {
-      handlePause3();
-      setIsSmokePulsating(false);
-    }
-  }, [data, smokeRanges]);
+  // useEffect(() => {
+  //   /* Smoke */
+  //   // if (newData.Smoke > ranges.Smoke) {
+  //   if (data.Smoke > smokeRanges.smoke_limit) {
+  //     handlePlay3();
+  //     setIsSmokePulsating(true);
+  //   } else {
+  //     handlePause3();
+  //     setIsSmokePulsating(false);
+  //   }
+  // }, [data, smokeRanges]);
 
   /* Fetch Live Graph Data */
   useEffect(() => {
@@ -786,6 +762,12 @@ const AdminDashboardTab = () => {
   const navigateUsers = () => {
     navigate("/dashboard/alert-users");
   };
+
+  // const findAvg = async () => {
+  //   const avgArr = await calculateAvg()
+  //   console.log("Average -> ", avgArr)
+  //   setAverageArr(avgArr)
+  // }
 
   return (
     <>
@@ -1320,6 +1302,22 @@ const AdminDashboardTab = () => {
                 >
                   <Typography variant="h2">{data.Humidity} %</Typography>
                 </Grid>
+                {/* {
+                  averageArr.humidity && (
+                    <Grid
+                      item
+                      xs={12}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        p: 0,
+                      }}
+                    >
+                      <Typography variant="h6">Average : {averageArr.humidity || "--"} %</Typography>
+                    </Grid>
+
+                  )
+                } */}
                 <Grid
                   item
                   xs={12}
@@ -1705,6 +1703,30 @@ const AdminDashboardTab = () => {
             </CardActions>
           </Card>
         </Grid>
+        {/* <Grid item xs={12}>
+            <Grid container spacing={1}>
+            <Grid
+                  item
+                  xs={6}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    mt: 5,
+                  }}
+                >
+                  <LoadingButton
+                    loading={false}
+                    // loadingPosition="start"
+                    // startIcon={<BarChartIcon />}
+                    variant="contained"
+                    onClick={findAvg}
+                  >
+                    Calculate Average
+                  </LoadingButton>
+                </Grid>
+            </Grid>
+        </Grid> */}
       </Grid>
 
       {/* Add Alert User Modal */}
