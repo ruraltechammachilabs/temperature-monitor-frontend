@@ -3,17 +3,13 @@ import { useState, useEffect } from "react";
 
 /* MUI */
 import Box from "@mui/material/Box";
-// import Card from "@mui/material/Card";
-// import CardHeader from "@mui/material/CardHeader";
+import { CircularProgress } from "@mui/material";
 
 /* Components */
 import PropTypes from "prop-types";
 import Chart, { useChart } from "/src/components/chart";
-// import { onValue, ref } from "firebase/database";
-// import { getChartData } from '../../../firebase/operations'
-// import { GraphDataContext } from "../../../Providers/GraphDataProvider";
 
-export const HumidityGraph = ({chartInfo}) => {
+export const HumidityGraph = ({ chartInfo }) => {
   // const { labels, colors, series, options } = chart;
 
   // const chartOptions = useChart({
@@ -57,35 +53,31 @@ export const HumidityGraph = ({chartInfo}) => {
   // });
 
   const [chartData, setChartData] = useState([]);
-  // const { humidGraphData } = useContext(GraphDataContext)
+  const [loadChart, setLoadChart] = useState(false);
 
   const chartOptions = useChart({
-    // fill: {
-    //   type: series.map((i) => i.fill),
-    // },  
-    // labels,
     xaxis: {
-      type: 'datetime',
+      type: "datetime",
       labels: {
         formatter: (value) => {
-          const date = new Date(value)
-          return date.toLocaleTimeString('en-US', { 
-            hour12: true, 
-            hour: 'numeric', 
-            minute: '2-digit' 
-          })
-        }
+          const date = new Date(value);
+          return date.toLocaleTimeString("en-US", {
+            hour12: true,
+            hour: "numeric",
+            minute: "2-digit",
+          });
+        },
       },
       fill: {
-        type: 'gradient',
-      }
+        type: "gradient",
+      },
     },
     chart: {
       zoom: {
-        autoScaleYaxis: true
-      }
+        autoScaleYaxis: true,
+      },
     },
-    
+
     tooltip: {
       shared: true,
       intersect: false,
@@ -98,14 +90,17 @@ export const HumidityGraph = ({chartInfo}) => {
         },
       },
     },
-    // ...options,
   });
 
   useEffect(() => {
-    if(chartInfo) {
-      setChartData(chartInfo)
+    setLoadChart(true);
+    if (chartInfo) {
+      setChartData(chartInfo);
+      setTimeout(() => {
+        setLoadChart(false);
+      }, 2000);
     }
-  }, [chartInfo])
+  }, [chartInfo]);
 
   // useEffect(() => {
   //   if(humidGraphData) {
@@ -122,33 +117,50 @@ export const HumidityGraph = ({chartInfo}) => {
   //   }
 
   //   fetchData()
-    
+
   // }, [])
 
   return (
-      <Box sx={{ p: 1, pb: 1 }}>
-        <Chart
-          dir="ltr"
-          type="area"
-          series={[{
-            name: "Humidity",
-            type: "area",
-            fill: "gradient",
-            data: chartData
-          }]}
-          options={chartOptions}
-          width="100%"
-          height={200}
-        />
-      </Box>
+    <>
+      {loadChart ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "400px",
+          }}
+        >
+          <CircularProgress />
+        </div>
+      ) : (
+        <Box sx={{ p: 1, pb: 1 }}>
+          <Chart
+            dir="ltr"
+            type="area"
+            series={[
+              {
+                name: "Humidity",
+                type: "area",
+                fill: "gradient",
+                data: chartData,
+              },
+            ]}
+            options={chartOptions}
+            width="100%"
+            height={200}
+          />
+        </Box>
+      )}
+    </>
   );
-}
+};
 
 HumidityGraph.propTypes = {
   chart: PropTypes.object,
   subheader: PropTypes.string,
   title: PropTypes.string,
-  chartInfo: PropTypes.array
+  chartInfo: PropTypes.array,
 };
 
-export default HumidityGraph
+export default HumidityGraph;

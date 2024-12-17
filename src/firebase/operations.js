@@ -205,12 +205,18 @@ export const getChartDataByDateTime = async () => {
       };
 
       const tempChartData = monitorData.map((item) => {
-        const tempData = [item.TimestampTime, item.Temperature];
+        let tempData = [] 
+        if(item.Temperature >=10 && item.Temperature < 40) {
+          tempData = [item.TimestampTime, item.Temperature];
+        }
         return tempData;
       });
 
       const humidChartData = monitorData.map((item) => {
-        const tempData = [item.TimestampTime, item.Humidity];
+        let tempData = []
+        if(item.Humidity >= 10) {
+          tempData = [item.TimestampTime, item.Humidity];
+        }
         return tempData;
       });
 

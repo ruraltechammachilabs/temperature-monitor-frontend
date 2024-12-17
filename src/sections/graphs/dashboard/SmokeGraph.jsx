@@ -7,11 +7,12 @@ import Box from "@mui/material/Box";
 /* Components */
 import PropTypes from "prop-types";
 import Chart, { useChart } from "/src/components/chart";
+import { CircularProgress } from "@mui/material";
 // import { onValue, ref } from "firebase/database";
 // import { getChartData } from '../../../firebase/operations'
 // import { GraphDataContext } from "../../../Providers/GraphDataProvider";
 
-export const SmokeGraph = ({chartInfo}) => {
+export const SmokeGraph = ({ chartInfo }) => {
   // const { labels, colors, series, options } = chart;
 
   // const chartOptions = useChart({
@@ -44,35 +45,31 @@ export const SmokeGraph = ({chartInfo}) => {
   // });
 
   const [chartData, setChartData] = useState([]);
-  // const { smokeGraphData } = useContext(GraphDataContext)
+  const [loadChart, setLoadChart] = useState(false);
 
   const chartOptions = useChart({
-    // fill: {
-    //   type: series.map((i) => i.fill),
-    // },  
-    // labels,
     xaxis: {
-      type: 'datetime',
+      type: "datetime",
       labels: {
         formatter: (value) => {
-          const date = new Date(value)
-          return date.toLocaleTimeString('en-US', { 
-            hour12: true, 
-            hour: 'numeric', 
-            minute: '2-digit' 
-          })
-        }
+          const date = new Date(value);
+          return date.toLocaleTimeString("en-US", {
+            hour12: true,
+            hour: "numeric",
+            minute: "2-digit",
+          });
+        },
       },
       fill: {
-        type: 'gradient',
-      }
+        type: "gradient",
+      },
     },
     chart: {
       zoom: {
-        autoScaleYaxis: true
-      }
+        autoScaleYaxis: true,
+      },
     },
-    
+
     tooltip: {
       shared: true,
       intersect: false,
@@ -85,59 +82,59 @@ export const SmokeGraph = ({chartInfo}) => {
         },
       },
     },
-    // ...options,
   });
 
   useEffect(() => {
-    if(chartInfo) {
-      setChartData(chartInfo)
+    setLoadChart(true);
+    if (chartInfo) {
+      setChartData(chartInfo);
+      setTimeout(() => {
+        setLoadChart(false);
+      }, 2000);
     }
-  }, [chartInfo])
-
-  // useEffect(() => {
-  //   if(smokeGraphData) {
-  //     setChartData(smokeGraphData)
-  //   }
-  // }, [smokeGraphData])
-
-  // useEffect( () => {
-
-  //   const fetchData = async () => {
-  //     getChartData('Smoke', (data) => {
-  //       setChartData(data)
-  //     })
-  //   }
-
-  //   fetchData()
-    
-  // }, [])
+  }, [chartInfo]);
 
   return (
-
-      <Box sx={{  pb: 1 }}>
-        <Chart
-          dir="ltr"
-          type="area"
-          series={[{
-            name: "Humidity",
-            type: "area",
-            fill: "gradient",
-            data: chartData
-          }]}
-          options={chartOptions}
-          width="100%"
-          height={200}
-        />
-      </Box>
-    // </Card>
+    <>
+      {loadChart ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "400px",
+          }}
+        >
+          <CircularProgress />
+        </div>
+      ) : (
+        <Box sx={{ pb: 1 }}>
+          <Chart
+            dir="ltr"
+            type="area"
+            series={[
+              {
+                name: "Humidity",
+                type: "area",
+                fill: "gradient",
+                data: chartData,
+              },
+            ]}
+            options={chartOptions}
+            width="100%"
+            height={200}
+          />
+        </Box>
+      )}
+    </>
   );
-}
+};
 
 SmokeGraph.propTypes = {
   chart: PropTypes.object,
   subheader: PropTypes.string,
   title: PropTypes.string,
-  chartInfo: PropTypes.array
+  chartInfo: PropTypes.array,
 };
 
-export default SmokeGraph
+export default SmokeGraph;

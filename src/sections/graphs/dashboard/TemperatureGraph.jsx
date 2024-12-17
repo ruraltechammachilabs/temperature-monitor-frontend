@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-
+import { CircularProgress } from "@mui/material";
 import Box from "@mui/material/Box";
 
 import ApexCharts from 'apexcharts'
@@ -12,7 +12,8 @@ import Chart, { useChart } from "../../../components/chart";
 export const TemperatureGraph = ({chartInfo}) => {
 
   const [chartData, setChartData] = useState([]);
-  const chartRef = useRef(null);
+  const [loadChart, setLoadChart] = useState(false)
+  // const chartRef = useRef(null);
   // const { tempGraphData } = useContext(GraphDataContext)
 
   const chartOptions = useChart({
@@ -53,8 +54,12 @@ export const TemperatureGraph = ({chartInfo}) => {
   });
 
   useEffect(() => {
+    setLoadChart(true)
     if(chartInfo) {
       setChartData(chartInfo)
+      setTimeout(() => {
+        setLoadChart(false)
+      }, 2000)
     }
   }, [chartInfo])
 
@@ -68,7 +73,6 @@ export const TemperatureGraph = ({chartInfo}) => {
         data: chartData,
       },
     ]);
-    console.log(chartData)
   }, [chartData]);
 
   // useEffect(() => {
@@ -96,11 +100,16 @@ export const TemperatureGraph = ({chartInfo}) => {
 
 
   return (
-      <Box sx={{ p: 1 }}>
+    <>
+      {
+        loadChart ? (
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "400px" }}>
+            <CircularProgress />
+          </div>
+        ) : (
+          <Box sx={{ p: 1 }}>
         <Chart
           key={chartData.length}
-          
-          ref={chartRef}
           dir="ltr"
           type="area"
           // series={[data: chartData]}
@@ -115,6 +124,11 @@ export const TemperatureGraph = ({chartInfo}) => {
           height={300}
         />
       </Box>
+        )
+      }
+
+    </>
+      
   );
 }
 

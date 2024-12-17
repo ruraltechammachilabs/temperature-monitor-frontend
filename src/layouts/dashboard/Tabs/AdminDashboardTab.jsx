@@ -343,7 +343,6 @@ const AdminDashboardTab = () => {
     fetchDataAndUpdateState();
 
     const unsubscribe = listenForDocumentChanges((newData) => {
-      console.log("new Data => ", newData)
       if(
           newData.Temperature >= 10 && 
           newData.Temperature < 40 && 
