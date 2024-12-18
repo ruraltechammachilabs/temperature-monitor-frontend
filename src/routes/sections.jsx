@@ -5,6 +5,7 @@ import DashboardLayout from "../layouts/dashboard";
 import AuthPage from "../layouts/Auth/AuthPage";
 import PrivateRoute from "./PrivateRoute";
 import LoginForm from "../layouts/Auth/LoginForm";
+import GraphDataProvider from "../Providers/GraphDataProvider";
 
 export const TemperatureDashboard = lazy(() => import("../pages/temperature-dashboard"));
 export const Page404 = lazy(() => import("../pages/page-not-found"));
@@ -20,11 +21,13 @@ export const Router = () => {
 			path: '/dashboard',
 			element: (
 					<PrivateRoute>
-						<DashboardLayout>
-							<Suspense>
-								<Outlet />
-							</Suspense>
-						</DashboardLayout>
+						<GraphDataProvider>
+							<DashboardLayout>
+								<Suspense>
+									<Outlet />
+								</Suspense>
+							</DashboardLayout>
+						</GraphDataProvider>
 					</PrivateRoute>
 			),
 			children: [

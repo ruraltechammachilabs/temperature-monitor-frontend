@@ -211,23 +211,30 @@ export const getChartDataByDateTime = async () => {
         }
         return tempData;
       });
+      const tempChartFilteredData = tempChartData.filter(item => item.length > 0)
 
       const humidChartData = monitorData.map((item) => {
         let tempData = []
         if(item.Humidity >= 10) {
-          tempData = [item.TimestampTime, item.Humidity];
+          tempData = [Number(item.TimestampTime), Number(item.Humidity)];
+        }
+        return tempData;
+      });
+      const humidChartFilteredData = humidChartData.filter(item => item.length > 0)
+
+      const smokeChartData = monitorData.map((item) => {
+        let tempData = []
+        if(item.Smoke > 0) {
+          tempData = [item.TimestampTime, item.Smoke];
         }
         return tempData;
       });
 
-      const smokeChartData = monitorData.map((item) => {
-        const tempData = [item.TimestampTime, item.Smoke];
-        return tempData;
-      });
+      const smokeChartFilteredData = smokeChartData.filter(item => item.length > 0)
 
-      liveArr.temperature = tempChartData;
-      liveArr.humidity = humidChartData;
-      liveArr.smoke = smokeChartData;
+      liveArr.temperature = tempChartFilteredData;
+      liveArr.humidity = humidChartFilteredData;
+      liveArr.smoke = smokeChartFilteredData;
 
       return liveArr;
     } else {

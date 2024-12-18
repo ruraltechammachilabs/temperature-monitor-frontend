@@ -1,5 +1,5 @@
 /* React */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
 /* MUI */
 import Box from "@mui/material/Box";
@@ -8,8 +8,9 @@ import { CircularProgress } from "@mui/material";
 /* Components */
 import PropTypes from "prop-types";
 import Chart, { useChart } from "/src/components/chart";
+import { GraphDataContext } from "../../../Providers/GraphDataProvider";
 
-export const HumidityGraph = ({ chartInfo }) => {
+export const HumidityGraph = () => {
   // const { labels, colors, series, options } = chart;
 
   // const chartOptions = useChart({
@@ -54,37 +55,79 @@ export const HumidityGraph = ({ chartInfo }) => {
 
   const [chartData, setChartData] = useState([]);
   const [loadChart, setLoadChart] = useState(false);
+  const { humidGraphData } = useContext(GraphDataContext)
+
+  // const chartOptions = useChart({
+  //   xaxis: {
+  //     type: "datetime",
+  //     labels: {
+  //       formatter: (value) => {
+  //         const date = new Date(value);
+  //         return date.toLocaleTimeString("en-US", {
+  //           hour12: true,
+  //           hour: "numeric",
+  //           minute: "2-digit",
+  //         });
+  //       },
+  //     },
+  //     fill: {
+  //       type: "gradient",
+  //     },
+  //   },
+  //   chart: {
+  //     zoom: {
+  //       autoScaleYaxis: true,
+  //     },
+  //   },
+
+  //   tooltip: {
+  //     shared: true,
+  //     intersect: false,
+  //     y: {
+  //       formatter: (value) => {
+  //         if (typeof value !== "undefined") {
+  //           return `${value.toFixed(1)} %`;
+  //         }
+  //         return value;
+  //       },
+  //     },
+  //   },
+  // });
 
   const chartOptions = useChart({
+    id: 'realtime-chart',
     xaxis: {
-      type: "datetime",
-      labels: {
-        formatter: (value) => {
-          const date = new Date(value);
-          return date.toLocaleTimeString("en-US", {
-            hour12: true,
-            hour: "numeric",
-            minute: "2-digit",
-          });
+      type: 'datetime',
+      animations: { 
+        enabled: true,
+        easing: 'linear',
+        dynamicAnimation: {
+          speed: 100, // Set the speed of real-time update animation
         },
       },
+      labels: {
+        formatter: (value) => {
+          const date = new Date(value)
+          return date.toLocaleTimeString('en-US', { 
+            hour12: true, 
+            hour: 'numeric', 
+            minute: '2-digit' 
+          })
+        }
+      },
       fill: {
-        type: "gradient",
-      },
+        type: 'gradient',
+      }
     },
-    chart: {
-      zoom: {
-        autoScaleYaxis: true,
-      },
-    },
-
+    
     tooltip: {
       shared: true,
       intersect: false,
       y: {
         formatter: (value) => {
           if (typeof value !== "undefined") {
-            return `${value.toFixed(1)} %`;
+            const val = Number(value)
+            return `${val.toFixed(1)} %`;
           }
           return value;
         },
@@ -93,32 +136,14 @@ export const HumidityGraph = ({ chartInfo }) => {
   });
 
   useEffect(() => {
-    setLoadChart(true);
-    if (chartInfo) {
-      setChartData(chartInfo);
+    setLoadChart(true)
+    if(humidGraphData) {
+      setChartData(humidGraphData)
       setTimeout(() => {
-        setLoadChart(false);
-      }, 2000);
+        setLoadChart(false)
+      }, 1000)
     }
-  }, [chartInfo]);
-
-  // useEffect(() => {
-  //   if(humidGraphData) {
-  //     setChartData(humidGraphData)
-  //   }
-  // }, [humidGraphData])
-
-  // useEffect( () => {
-
-  //   const fetchData = async () => {
-  //     getChartData('Humidity', (data) => {
-  //       setChartData(data)
-  //     })
-  //   }
-
-  //   fetchData()
-
-  // }, [])
+  }, [humidGraphData])
 
   return (
     <>
@@ -134,23 +159,21 @@ export const HumidityGraph = ({ chartInfo }) => {
           <CircularProgress />
         </div>
       ) : (
-        <Box sx={{ p: 1, pb: 1 }}>
-          <Chart
-            dir="ltr"
-            type="area"
-            series={[
-              {
-                name: "Humidity",
-                type: "area",
-                fill: "gradient",
-                data: chartData,
-              },
-            ]}
-            options={chartOptions}
-            width="100%"
-            height={200}
-          />
-        </Box>
+        <Box sx={{ p: 1 }}>
+        <Chart
+          dir="ltr"
+          type="area"
+          series={[{
+            name: "Humidity",
+            type: "area",
+            fill: "gradient",
+            data: chartData
+          }]}
+          options={chartOptions}
+          width="100%"
+          height={300}
+        />
+      </Box>
       )}
     </>
   );

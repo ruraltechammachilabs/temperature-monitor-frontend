@@ -71,7 +71,7 @@ import {
   listenForTempRangeChanges,
   listenForHumidRangeChanges,
   listenForSmokeRangeChanges,
-  calculateAvg,
+  // calculateAvg,
   // deleteNodesWithoutTimestampTime
 } from "../../../firebase/operations";
 import { deleteAlertUser } from "../../../firebase/AlertUserOperations";
@@ -90,6 +90,9 @@ import {
   // convertDateStringToMilliseconds
 } from "../../../firebase/operations";
 import { useNavigate } from "react-router-dom";
+import { GraphDataContext } from "../../../Providers/GraphDataProvider";
+import dayjs from "dayjs";
+import RefreshButton from "../../../components/RefreshButton/RefreshButton";
 // import { setThreshold } from "../../../services/monitoringSlice";
 // import { GraphDataContext } from "../../../Providers/GraphDataProvider";
 
@@ -125,7 +128,7 @@ const AdminDashboardTab = () => {
 
   const [alertUsers, setAlertUsers] = useState([]);
 
-  const [averageArr, setAverageArr] = useState([])
+  // const [averageArr, setAverageArr] = useState([])
 
   /* Graphs */
   const [mainGraphData, setMainGraphData] = useState([]);
@@ -135,7 +138,9 @@ const AdminDashboardTab = () => {
   const [showHumidGraph, setShowHumidGraph] = useState(false);
   const [showSmokeGraph, setShowSmokeGraph] = useState(false);
 
+  const [graphUpdateText, setGraphUpdateText] = useState(dayjs().format('ddd, MMM D, YYYY h:mm A'))
 
+  const { setTempGraphData, setHumidGraphData, setSmokeGraphData } = useContext(GraphDataContext)
 
   /* UI */
 
@@ -305,7 +310,8 @@ const AdminDashboardTab = () => {
       if(
         data.Temperature >= 10 && 
         data.Temperature < 40 && 
-        data.Humidity > 10
+        data.Humidity > 10 &&
+        data.Smoke > 0
       ) {
         setData(data);
     }
@@ -346,7 +352,8 @@ const AdminDashboardTab = () => {
       if(
           newData.Temperature >= 10 && 
           newData.Temperature < 40 && 
-          newData.Humidity > 10
+          newData.Humidity > 10 &&
+          newData.Smoke > 0
         ) {
           setData(newData);
       }
@@ -491,22 +498,29 @@ const AdminDashboardTab = () => {
   // }, [data, smokeRanges]);
 
   /* Fetch Live Graph Data */
-  useEffect(() => {
-    const fetchLiveData = async () => {
-      const mainData = await getChartDataByDateTime();
+  const fetchLiveData = async () => {
+    const mainData = await getChartDataByDateTime();
+    // setMainGraphData(mainData);
+    setTempGraphData(mainData.temperature)
+    setHumidGraphData(mainData.humidity)
+    setSmokeGraphData(mainData.smoke)
 
-      setMainGraphData(mainData);
-    };
+    setGraphUpdateText(dayjs().format('ddd, MMM D, YYYY h:mm A'))
 
+    setTimeout(() => {
+      setIsGraphUpdated(false)
+    }, 200);
+  }
+
+  useEffect(() => {      
+    fetchLiveData()
+  }, []);
+
+  useEffect(() => {      
     if(isGraphUpdated) {
-      
       fetchLiveData();
-
-      setTimeout(() => {
-        setIsGraphUpdated(false)
-      }, 200);
     }
-  }, [isGraphUpdated]);
+}, [isGraphUpdated]);
 
   /* Temperature Changes Alert */
   useEffect(() => {
@@ -744,18 +758,24 @@ const AdminDashboardTab = () => {
 
   /* Toggle Button Click Events for Viewing Graph */
   const handleTempGraphButtonClick = () => {
-    setIsGraphUpdated(true)
     setShowTempGraph(!showTempGraph);
   };
 
   const handleHumidityGraphButtonClick = () => {
-    setIsGraphUpdated(true)
     setShowHumidGraph(!showHumidGraph);
   };
 
   const handleSmokeGraphButtonClick = () => {
-    setIsGraphUpdated(true)
     setShowSmokeGraph(!showSmokeGraph);
+  };
+
+  const handleRefreshGraph = () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        setIsGraphUpdated(true)
+        resolve();
+      }, 2000); // Simulating 2 seconds of loading
+    });
   };
 
   const navigateUsers = () => {
@@ -912,6 +932,21 @@ const AdminDashboardTab = () => {
         </Grid>
         <CurrentTime />
 
+        {/* Graph Update Status */}
+        <Grid 
+          item 
+          xs={12} 
+          sx={{
+            display: 'flex',
+            justifyContent: 'end',
+            alignItems: 'center'
+          }}
+        >
+          <RefreshButton onRefresh={handleRefreshGraph} />
+          <Typography variant="body2">
+            Graph Updated at {graphUpdateText}
+          </Typography>
+        </Grid>
         {/* Limits */}
         <Grid item xs={12} alignItems="center" justifyContent="center">
           <Card
@@ -1245,10 +1280,7 @@ const AdminDashboardTab = () => {
 
                 {showTempGraph && (
                   <Grid item xs={12}>
-                    <TemperatureGraph
-                      title="Live Temperature Monitor"
-                      chartInfo={mainGraphData.temperature}
-                    />
+                    <TemperatureGraph title="Live Temperature Monitor" />
                   </Grid>
                 )}
               </Grid>
@@ -1339,10 +1371,7 @@ const AdminDashboardTab = () => {
                 </Grid>
                 {showHumidGraph && (
                   <Grid item xs={12}>
-                    <HumidityGraph
-                      title="Live Humidity Monitor"
-                      chartInfo={mainGraphData.humidity}
-                    />
+                    <HumidityGraph title="Live Humidity Monitor" />
                   </Grid>
                 )}
                 {/* // chart={{
@@ -1436,7 +1465,7 @@ const AdminDashboardTab = () => {
                 </Grid>
                 {showSmokeGraph && (
                   <Grid item xs={12}>
-                    <SmokeGraph chartInfo={mainGraphData.smoke} />
+                    <SmokeGraph />
                   </Grid>
                 )}
                 {/* // title="Live Smoke Detection Monitor"

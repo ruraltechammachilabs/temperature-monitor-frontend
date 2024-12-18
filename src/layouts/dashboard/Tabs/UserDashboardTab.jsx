@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 /* React */
-import { useState, useEffect, useRef, forwardRef } from "react";
+import { useState, useEffect, useRef, forwardRef, useContext } from "react";
 
 /* MUI */
 import {
@@ -31,6 +31,7 @@ import QuickBanner from "../../../sections/banner/QuickBanner";
 import TemperatureGraph from "../../../sections/graphs/dashboard/TemperatureGraph";
 import HumidityGraph from "../../../sections/graphs/dashboard/HumidityGraph";
 import SmokeGraph from "../../../sections/graphs/dashboard/SmokeGraph";
+import RefreshButton from "../../../components/RefreshButton/RefreshButton";
 
 /* Services */
 import {
@@ -39,7 +40,6 @@ import {
   listenForTempRangeChanges,
   listenForHumidRangeChanges,
   listenForSmokeRangeChanges,
-  // convertDateStringToMilliseconds,
 } from "../../../firebase/operations";
 import {
   getHumidRanges,
@@ -57,10 +57,10 @@ import "../../../styles/dashboard.css";
 /* Components */
 import CurrentTime from "../../../components/current-time/CurrentTime";
 import {
-  // convertToTimestamp,
-  // setRealtimeValues,
   getChartDataByDateTime,
 } from "../../../firebase/operations";
+import dayjs from "dayjs";
+import { GraphDataContext } from "../../../Providers/GraphDataProvider";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -69,7 +69,6 @@ const Transition = forwardRef(function Transition(props, ref) {
 const UserDashboardTab = () => {
   const mdDown = useResponsive("down", "md");
   const lgUp = useResponsive("up", "lg");
-  // const mdDown = useResponsive("down", "md");
 
   const [tempRanges, setTempRanges] = useState({});
   const [humidRanges, setHumidRanges] = useState({});
@@ -81,12 +80,16 @@ const UserDashboardTab = () => {
   // const [isHumidityPulsating, setIsHumidityPulsating] = useState(false);
 
   /* Graphs */
-  const [mainGraphData, setMainGraphData] = useState([]);
+  // const [mainGraphData, setMainGraphData] = useState([]);
   const [isGraphUpdated, setIsGraphUpdated] = useState(false);
 
   const [showTempGraph, setShowTempGraph] = useState(false);
   const [showHumidGraph, setShowHumidGraph] = useState(false);
   const [showSmokeGraph, setShowSmokeGraph] = useState(false);
+
+  const [graphUpdateText, setGraphUpdateText] = useState(dayjs().format('ddd, MMM D, YYYY h:mm A'))
+
+  const { setTempGraphData, setHumidGraphData, setSmokeGraphData } = useContext(GraphDataContext)
 
   /* system status */
   const [systemStatus, setSystemStatus] = useState("online");
@@ -177,7 +180,8 @@ const UserDashboardTab = () => {
       if(
         data.Temperature >= 10 && 
         data.Temperature < 40 && 
-        data.Humidity > 10
+        data.Humidity > 10 &&
+        data.Smoke > 0
       ) {
         setData(data);
       }
@@ -218,7 +222,8 @@ const UserDashboardTab = () => {
       if(
         newData.Temperature >= 10 && 
         newData.Temperature < 40 && 
-        newData.Humidity > 10
+        newData.Humidity > 10 &&
+        newData.Smoke > 0
       ) {
         setData(newData);
       }
@@ -326,21 +331,44 @@ const UserDashboardTab = () => {
   }, [data, smokeRanges]);
 
   /* Fetch Live Graph Data */
-  useEffect(() => {
-    const fetchLiveData = async () => {
-      const mainData = await getChartDataByDateTime();
+  // useEffect(() => {
+  //   const fetchLiveData = async () => {
+  //     const mainData = await getChartDataByDateTime();
 
-      setMainGraphData(mainData);
-    };
+  //     setMainGraphData(mainData);
+  //   };
 
-    if (isGraphUpdated) {
+  //   if (isGraphUpdated) {
+  //     fetchLiveData();
+
+  //     setTimeout(() => {
+  //       setIsGraphUpdated(false);
+  //     }, 200);
+  //   }
+  // }, [isGraphUpdated]);
+
+  const fetchLiveData = async () => {
+    const mainData = await getChartDataByDateTime();
+    setTempGraphData(mainData.temperature)
+    setHumidGraphData(mainData.humidity)
+    setSmokeGraphData(mainData.smoke)
+
+    setGraphUpdateText(dayjs().format('ddd, MMM D, YYYY h:mm A'))
+
+    setTimeout(() => {
+      setIsGraphUpdated(false)
+    }, 200);
+  }
+
+  useEffect(() => {      
+    fetchLiveData()
+  }, []);
+
+  useEffect(() => {      
+    if(isGraphUpdated) {
       fetchLiveData();
-
-      setTimeout(() => {
-        setIsGraphUpdated(false);
-      }, 200);
     }
-  }, [isGraphUpdated]);
+}, [isGraphUpdated]);
 
   /* Temperature Changes Alert */
   useEffect(() => {
@@ -581,18 +609,24 @@ const UserDashboardTab = () => {
 
   /* Toggle Button Click Events for Viewing Graph */
   const handleTempGraphButtonClick = () => {
-    setIsGraphUpdated(true);
     setShowTempGraph(!showTempGraph);
   };
 
   const handleHumidityGraphButtonClick = () => {
-    setIsGraphUpdated(true);
     setShowHumidGraph(!showHumidGraph);
   };
 
   const handleSmokeGraphButtonClick = () => {
-    setIsGraphUpdated(true);
     setShowSmokeGraph(!showSmokeGraph);
+  };
+
+  const handleRefreshGraph = () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        setIsGraphUpdated(true)
+        resolve();
+      }, 2000); // Simulating 2 seconds of loading
+    });
   };
 
   /* System On Off Dialog */
@@ -701,6 +735,22 @@ const UserDashboardTab = () => {
         </Grid>
 
         <CurrentTime />
+
+        {/* Graph Update Status */}
+        <Grid 
+          item 
+          xs={12} 
+          sx={{
+            display: 'flex',
+            justifyContent: 'end',
+            alignItems: 'center'
+          }}
+        >
+          <RefreshButton onRefresh={handleRefreshGraph} />
+          <Typography variant="body2">
+            Graph Updated at {graphUpdateText}
+          </Typography>
+        </Grid>
 
         {/* Limits */}
         <Grid item xs={12} alignItems="center" justifyContent="center">
@@ -932,10 +982,7 @@ const UserDashboardTab = () => {
                 </Grid>
                 {showTempGraph && (
                   <Grid item xs={12}>
-                    <TemperatureGraph
-                      title="Live Temperature Monitor"
-                      chartInfo={mainGraphData.temperature}
-                    />
+                    <TemperatureGraph title="Live Temperature Monitor" />
                   </Grid>
                 )}
               </Grid>
@@ -1011,10 +1058,7 @@ const UserDashboardTab = () => {
                 </Grid>
                 {showHumidGraph && (
                   <Grid item xs={12}>
-                    <HumidityGraph
-                      title="Live Humidity Monitor"
-                      chartInfo={mainGraphData.humidity}
-                    />
+                    <HumidityGraph title="Live Humidity Monitor" />
                   </Grid>
                 )}
               </Grid>
@@ -1085,7 +1129,7 @@ const UserDashboardTab = () => {
                 </Grid>
                 {showSmokeGraph && (
                   <Grid item xs={12}>
-                    <SmokeGraph chartInfo={mainGraphData.smoke} />
+                    <SmokeGraph />
                   </Grid>
                 )}
               </Grid>

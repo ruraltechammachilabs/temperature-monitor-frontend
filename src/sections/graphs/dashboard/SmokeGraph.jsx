@@ -1,5 +1,5 @@
 /* React */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
 /* MUI */
 import Box from "@mui/material/Box";
@@ -8,11 +8,9 @@ import Box from "@mui/material/Box";
 import PropTypes from "prop-types";
 import Chart, { useChart } from "/src/components/chart";
 import { CircularProgress } from "@mui/material";
-// import { onValue, ref } from "firebase/database";
-// import { getChartData } from '../../../firebase/operations'
-// import { GraphDataContext } from "../../../Providers/GraphDataProvider";
+import { GraphDataContext } from "../../../Providers/GraphDataProvider";
 
-export const SmokeGraph = ({ chartInfo }) => {
+export const SmokeGraph = () => {
   // const { labels, colors, series, options } = chart;
 
   // const chartOptions = useChart({
@@ -46,6 +44,7 @@ export const SmokeGraph = ({ chartInfo }) => {
 
   const [chartData, setChartData] = useState([]);
   const [loadChart, setLoadChart] = useState(false);
+  const { smokeGraphData } = useContext(GraphDataContext)
 
   const chartOptions = useChart({
     xaxis: {
@@ -85,14 +84,14 @@ export const SmokeGraph = ({ chartInfo }) => {
   });
 
   useEffect(() => {
-    setLoadChart(true);
-    if (chartInfo) {
-      setChartData(chartInfo);
+    setLoadChart(true)
+    if(smokeGraphData) {
+      setChartData(smokeGraphData)
       setTimeout(() => {
-        setLoadChart(false);
-      }, 2000);
+        setLoadChart(false)
+      }, 1000)
     }
-  }, [chartInfo]);
+  }, [smokeGraphData])
 
   return (
     <>
@@ -122,7 +121,7 @@ export const SmokeGraph = ({ chartInfo }) => {
             ]}
             options={chartOptions}
             width="100%"
-            height={200}
+            height={300}
           />
         </Box>
       )}
