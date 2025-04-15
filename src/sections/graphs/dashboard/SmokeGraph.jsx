@@ -90,10 +90,13 @@ export const SmokeGraph = () => {
       setTimeout(() => {
         setLoadChart(false)
       }, 1000)
+    } else {
+      setChartData([])
+      setLoadChart(false)
     }
   }, [smokeGraphData])
 
-  return (
+  /* return (
     <>
       {loadChart ? (
         <div
@@ -113,7 +116,7 @@ export const SmokeGraph = () => {
             type="area"
             series={[
               {
-                name: "Humidity",
+                name: "Smoke",
                 type: "area",
                 fill: "gradient",
                 data: chartData,
@@ -123,6 +126,54 @@ export const SmokeGraph = () => {
             width="100%"
             height={300}
           />
+        </Box>
+      )}
+    </>
+  ); */
+
+  return (
+    <>
+      {loadChart ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "200px",
+          }}
+        >
+          <CircularProgress />
+        </div>
+      ) : (
+        <Box sx={{ p: 1 }}>
+          {chartData.length === 0 ? (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "200px",
+              }}
+            >
+              <h4>No Data Available</h4>
+            </div>
+          ) : (
+            <Chart
+            dir="ltr"
+            type="area"
+            series={[
+              {
+                name: "Smoke",
+                type: "area",
+                fill: "gradient",
+                data: chartData,
+              },
+            ]}
+            options={chartOptions}
+            width="100%"
+            height={300}
+          />
+          )}
         </Box>
       )}
     </>

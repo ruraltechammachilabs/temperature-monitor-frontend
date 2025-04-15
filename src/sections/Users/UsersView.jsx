@@ -48,7 +48,7 @@ const UsersView = () => {
 	const { users, setUsers } = useContext(GlobalDataContext);
 	const { isNewUser } = useContext(AuthContext)
 
-	const [cardHeight, setCardHeight] =  useState("15dvh")
+	const [cardHeight, setCardHeight] =  useState("20dvh")
 
 	// const [users, setUsers] = useState([
 	//   {
@@ -163,7 +163,13 @@ const UsersView = () => {
 									fontWeight: 600,
 									height: "100%",
 									// minHeight: (mdUp && xlDown) ? "29dvh" : "28dvh",
-									minHeight: cardHeight
+									// minHeight: cardHeight
+									minHeight: {
+										xs: '15dvh', // Mobile
+										sm: '30dvh', // Tablet
+										md: '32dvh', // Desktop
+										lg: '30dvh'  // Large screens
+									},
 								}}
 							>
 								<Stack>

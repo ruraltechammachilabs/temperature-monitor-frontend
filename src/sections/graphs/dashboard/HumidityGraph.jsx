@@ -55,7 +55,7 @@ export const HumidityGraph = () => {
 
   const [chartData, setChartData] = useState([]);
   const [loadChart, setLoadChart] = useState(false);
-  const { humidGraphData } = useContext(GraphDataContext)
+  const { humidGraphData } = useContext(GraphDataContext);
 
   // const chartOptions = useChart({
   //   xaxis: {
@@ -95,38 +95,38 @@ export const HumidityGraph = () => {
   // });
 
   const chartOptions = useChart({
-    id: 'realtime-chart',
+    id: "realtime-chart",
     xaxis: {
-      type: 'datetime',
-      animations: { 
+      type: "datetime",
+      animations: {
         enabled: true,
-        easing: 'linear',
+        easing: "linear",
         dynamicAnimation: {
           speed: 100, // Set the speed of real-time update animation
         },
       },
       labels: {
         formatter: (value) => {
-          const date = new Date(value)
-          return date.toLocaleTimeString('en-US', { 
-            hour12: true, 
-            hour: 'numeric', 
-            minute: '2-digit' 
-          })
-        }
+          const date = new Date(value);
+          return date.toLocaleTimeString("en-US", {
+            hour12: true,
+            hour: "numeric",
+            minute: "2-digit",
+          });
+        },
       },
       fill: {
-        type: 'gradient',
-      }
+        type: "gradient",
+      },
     },
-    
+
     tooltip: {
       shared: true,
       intersect: false,
       y: {
         formatter: (value) => {
           if (typeof value !== "undefined") {
-            const val = Number(value)
+            const val = Number(value);
             return `${val.toFixed(1)} %`;
           }
           return value;
@@ -136,16 +136,19 @@ export const HumidityGraph = () => {
   });
 
   useEffect(() => {
-    setLoadChart(true)
-    if(humidGraphData) {
-      setChartData(humidGraphData)
+    setLoadChart(true);
+    if (humidGraphData) {
+      setChartData(humidGraphData);
       setTimeout(() => {
-        setLoadChart(false)
-      }, 1000)
+        setLoadChart(false);
+      }, 1000);
+    } else {
+      setChartData([]);
+      setLoadChart(false);
     }
-  }, [humidGraphData])
+  }, [humidGraphData]);
 
-  return (
+  /* return (
     <>
       {loadChart ? (
         <div
@@ -174,6 +177,54 @@ export const HumidityGraph = () => {
           height={300}
         />
       </Box>
+      )}
+    </>
+  ); */
+
+  return (
+    <>
+      {loadChart ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "200px",
+          }}
+        >
+          <CircularProgress />
+        </div>
+      ) : (
+        <Box sx={{ p: 1 }}>
+          {chartData.length === 0 ? (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "200px",
+              }}
+            >
+              <h4>No Data Available</h4>
+            </div>
+          ) : (
+            <Chart
+              dir="ltr"
+              type="area"
+              series={[
+                {
+                  name: "Humidity",
+                  type: "area",
+                  fill: "gradient",
+                  data: chartData,
+                },
+              ]}
+              options={chartOptions}
+              width="100%"
+              height={300}
+            />
+          )}
+        </Box>
       )}
     </>
   );

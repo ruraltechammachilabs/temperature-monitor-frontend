@@ -59,7 +59,16 @@ const UserView = ({ user }) => {
           }}
         > */}
         {/* Picture */}
-        <CardContent>
+        <CardContent
+          sx={{
+            minHeight: {
+              xs: '30dvh', // Mobile
+              sm: '25dvh', // Tablet
+              md: '20dvh', // Desktop
+              lg: '20dvh'  // Large screens
+            },
+          }}
+        >
           <Grid container spacing={1}>
             <Grid
               item
