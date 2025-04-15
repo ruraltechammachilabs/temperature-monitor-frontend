@@ -238,7 +238,6 @@ export const getChartDataByDateTime = async () => {
 
       return liveArr;
     } else {
-      console.log("No recent data found");
       return [];
     }
   } catch (error) {

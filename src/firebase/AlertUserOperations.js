@@ -45,12 +45,10 @@ export const getLimitedAlertUsers = async () => {
       const usersData = Object.values(snapshot.val());
       return usersData;
     } else {
-      console.log("No Alert users found.");
       return [];
     }
   } catch (error) {
     console.error("Error fetching Alert users:", error);
-    throw error;
   }
 };
 
@@ -67,7 +65,6 @@ export const addAlertUser = async (newAlertUser, counts) => {
       updates: newAlertUser.updates,
       ...counts,
     });
-    // console.log("Alert user added successfully!");
     return true; // Indicate success
   } catch (error) {
     console.error("Error adding alert user:", error);
